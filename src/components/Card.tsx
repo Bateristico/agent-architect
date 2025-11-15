@@ -61,8 +61,7 @@ export const Card: React.FC<CardProps> = ({
   return (
     <motion.div
       drag={isInHand}
-      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
-      dragElastic={0.1}
+      dragMomentum={false}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       whileHover={isInHand ? { scale: 1.05, y: -5 } : {}}
