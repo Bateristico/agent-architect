@@ -262,32 +262,35 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
               No cards in hand
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-2">
-              {hand.map((card, index) => (
-                <motion.div
-                  key={card.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex-shrink-0 relative"
-                >
-                  <Card
-                    card={card}
-                    onClick={() => handleCardClick(card)}
-                    onDragStart={() => handleDragStart(card)}
-                    onDragEnd={(event, info) => handleDragEnd(card, event, info)}
-                    isDragging={draggedCard?.id === card.id}
-                    isInHand={true}
-                  />
-                  {card.energyCost > energyRemaining && (
-                    <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center pointer-events-none">
-                      <span className="text-red-300 font-bold text-sm">
-                        Not Enough Energy
-                      </span>
-                    </div>
-                  )}
-                </motion.div>
-              ))}
+            <div className="relative">
+              <div className="flex gap-6 overflow-x-auto pb-2" style={{ overflow: 'visible' }}>
+                {hand.map((card, index) => (
+                  <motion.div
+                    key={card.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className="flex-shrink-0"
+                    style={{ position: 'relative', zIndex: draggedCard?.id === card.id ? 9999 : 1 }}
+                  >
+                    <Card
+                      card={card}
+                      onClick={() => handleCardClick(card)}
+                      onDragStart={() => handleDragStart(card)}
+                      onDragEnd={(event, info) => handleDragEnd(card, event, info)}
+                      isDragging={draggedCard?.id === card.id}
+                      isInHand={true}
+                    />
+                    {card.energyCost > energyRemaining && (
+                      <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center pointer-events-none">
+                        <span className="text-red-300 font-bold text-sm">
+                          Not Enough Energy
+                        </span>
+                      </div>
+                    )}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           )}
 

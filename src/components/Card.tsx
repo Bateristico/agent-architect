@@ -62,20 +62,25 @@ export const Card: React.FC<CardProps> = ({
     <motion.div
       drag={isInHand}
       dragMomentum={false}
-      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
+      dragElastic={0.1}
+      dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      whileHover={isInHand ? { scale: 1.05, y: -5 } : {}}
-      whileTap={isInHand ? { scale: 0.95 } : {}}
+      whileHover={isInHand && !isDragging ? { scale: 1.05, y: -5 } : {}}
+      whileTap={isInHand && !isDragging ? { scale: 0.95 } : {}}
       whileDrag={{ scale: 1.1, rotate: 5, zIndex: 9999 }}
       onClick={onClick}
-      style={{ position: isDragging ? 'fixed' : 'relative' }}
+      animate={isDragging ? {} : { x: 0, y: 0 }}
       className={`
         w-[150px] h-[200px] rounded-lg overflow-hidden
         ${isInHand ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
         shadow-lg hover:shadow-xl transition-shadow
         ${isDragging ? 'shadow-2xl' : ''}
       `}
+      style={{
+        position: isInHand ? 'relative' : 'relative',
+        zIndex: isDragging ? 9999 : 1,
+      }}
     >
       {/* Card Background with Gradient */}
       <div className={`absolute inset-0 bg-gradient-to-br ${colors.gradient} opacity-90`} />
