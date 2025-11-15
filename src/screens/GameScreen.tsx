@@ -61,9 +61,20 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   };
 
   // Handle card drag end
-  const handleDragEnd = (card: ICard, event: any, info: any) => {
+  const handleDragEnd = (card: ICard, _event: any, info: any) => {
     const { point } = info;
     let droppedOnSlot: keyof IBoard | null = null;
+
+    // Auto-scroll logic - scroll page when dragging near top/bottom edges
+    const scrollThreshold = 100;
+    const scrollSpeed = 10;
+    const viewportHeight = window.innerHeight;
+
+    if (point.y < scrollThreshold) {
+      window.scrollBy({ top: -scrollSpeed, behavior: 'smooth' });
+    } else if (point.y > viewportHeight - scrollThreshold) {
+      window.scrollBy({ top: scrollSpeed, behavior: 'smooth' });
+    }
 
     // Check which slot the card was dropped on
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
@@ -251,7 +262,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
               No cards in hand
             </div>
           ) : (
-            <div className="flex gap-4 overflow-x-auto pb-2">
+            <div className="flex gap-4 overflow-x-auto overflow-y-visible pb-2">
               {hand.map((card, index) => (
                 <motion.div
                   key={card.id}

@@ -62,14 +62,16 @@ export const Card: React.FC<CardProps> = ({
     <motion.div
       drag={isInHand}
       dragMomentum={false}
+      dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
       whileHover={isInHand ? { scale: 1.05, y: -5 } : {}}
       whileTap={isInHand ? { scale: 0.95 } : {}}
-      whileDrag={{ scale: 1.1, rotate: 5, zIndex: 100 }}
+      whileDrag={{ scale: 1.1, rotate: 5, zIndex: 9999 }}
       onClick={onClick}
+      style={{ position: isDragging ? 'fixed' : 'relative' }}
       className={`
-        relative w-[150px] h-[200px] rounded-lg overflow-hidden
+        w-[150px] h-[200px] rounded-lg overflow-hidden
         ${isInHand ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
         shadow-lg hover:shadow-xl transition-shadow
         ${isDragging ? 'shadow-2xl' : ''}
