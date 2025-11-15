@@ -103,16 +103,29 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   const handleDragEnd = (card: ICard, _event: any, info: any) => {
     const { point } = info;
     let droppedOnSlot: keyof IBoard | null = null;
+    let minDistance = Infinity;
 
-    // Check which slot the card was dropped on
+    // Find the closest slot to the drop point
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
       if (!element) continue;
       const rect = element.getBoundingClientRect();
+
+      // Check if point is within the slot bounds
       if (point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom) {
-        droppedOnSlot = slotType as keyof IBoard;
-        break;
+        // Calculate distance to center of slot
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const distance = Math.sqrt(Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2));
+
+        // Use the slot with the closest center
+        if (distance < minDistance) {
+          minDistance = distance;
+          droppedOnSlot = slotType as keyof IBoard;
+        }
       }
     }
+
+    console.log('Drop point:', point, 'Detected slot:', droppedOnSlot, 'Card type:', card.type);
 
     if (droppedOnSlot) {
       handleCardPlace(card, droppedOnSlot);
