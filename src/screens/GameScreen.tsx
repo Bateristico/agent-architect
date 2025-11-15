@@ -42,6 +42,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   const [mouseY, setMouseY] = useState(0);
   const slotRefs = useRef<Record<string, HTMLElement | null>>({});
   const scrollIntervalRef = useRef<number | null>(null);
+  const dragPointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Auto-scroll effect when dragging near screen edges
   useEffect(() => {
@@ -99,16 +100,35 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
     setSelectedCard(card);
   };
 
+  // Handle card drag (while dragging)
+  const handleDrag = (_event: any, info: any) => {
+    const { point } = info;
+    dragPointRef.current = point;
+  };
+
   // Handle card drag end
   const handleDragEnd = (card: ICard, _event: any, info: any) => {
     const { point } = info;
     let droppedOnSlot: keyof IBoard | null = null;
     let minDistance = Infinity;
 
+    console.log('=== DROP DEBUG ===');
+    console.log('Drop point:', point);
+    console.log('Card:', card.name, 'Type:', card.type);
+
     // Find the closest slot to the drop point
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
       if (!element) continue;
       const rect = element.getBoundingClientRect();
+
+      console.log(`Slot ${slotType}:`, {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        width: rect.width,
+        height: rect.height,
+      });
 
       // Check if point is within the slot bounds
       if (point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom) {
@@ -116,6 +136,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
         const distance = Math.sqrt(Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2));
+
+        console.log(`  -> Point is inside ${slotType}, distance to center: ${distance}`);
 
         // Use the slot with the closest center
         if (distance < minDistance) {
@@ -125,7 +147,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
       }
     }
 
-    console.log('Drop point:', point, 'Detected slot:', droppedOnSlot, 'Card type:', card.type);
+    console.log('Final detected slot:', droppedOnSlot);
+    console.log('==================');
 
     if (droppedOnSlot) {
       handleCardPlace(card, droppedOnSlot);
