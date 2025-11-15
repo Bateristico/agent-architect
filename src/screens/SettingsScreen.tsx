@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Volume2, Music } from 'lucide-react';
+import { useGameStore } from '../store/gameStore';
 
 interface SettingsScreenProps {
   onBack: () => void;
 }
 
 export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
+  const { settings, toggleSound, toggleMusic } = useGameStore();
+
   return (
     <div className="min-h-screen flex flex-col px-4 py-8">
       {/* Header */}
@@ -38,11 +41,15 @@ export const SettingsScreen: React.FC<SettingsScreenProps> = ({ onBack }) => {
             icon={<Volume2 className="w-5 h-5" />}
             label="Sound Effects"
             description="Enable game sound effects"
+            checked={settings.soundEnabled}
+            onChange={toggleSound}
           />
           <SettingRow
             icon={<Music className="w-5 h-5" />}
             label="Background Music"
             description="Enable background music (Coming soon)"
+            checked={settings.musicEnabled}
+            onChange={toggleMusic}
             disabled
           />
         </div>
@@ -61,10 +68,12 @@ interface SettingRowProps {
   icon: React.ReactNode;
   label: string;
   description: string;
+  checked: boolean;
+  onChange: () => void;
   disabled?: boolean;
 }
 
-const SettingRow: React.FC<SettingRowProps> = ({ icon, label, description, disabled }) => {
+const SettingRow: React.FC<SettingRowProps> = ({ icon, label, description, checked, onChange, disabled }) => {
   return (
     <div className={`flex items-center justify-between ${disabled ? 'opacity-50' : ''}`}>
       <div className="flex items-center gap-3">
@@ -77,6 +86,8 @@ const SettingRow: React.FC<SettingRowProps> = ({ icon, label, description, disab
       <label className="relative inline-flex items-center cursor-pointer">
         <input
           type="checkbox"
+          checked={checked}
+          onChange={onChange}
           disabled={disabled}
           className="sr-only peer"
         />

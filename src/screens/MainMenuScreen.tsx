@@ -2,10 +2,12 @@ import { motion } from 'framer-motion';
 import { Play, Settings, Info } from 'lucide-react';
 
 interface MainMenuScreenProps {
-  onNavigate: (screen: 'play' | 'settings' | 'about') => void;
+  onNavigate: () => void;
+  onSettings: () => void;
+  onAbout: () => void;
 }
 
-export const MainMenuScreen: React.FC<MainMenuScreenProps> = ({ onNavigate }) => {
+export const MainMenuScreen: React.FC<MainMenuScreenProps> = ({ onNavigate, onSettings, onAbout }) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
       {/* Title */}
@@ -33,19 +35,19 @@ export const MainMenuScreen: React.FC<MainMenuScreenProps> = ({ onNavigate }) =>
         <MenuButton
           icon={<Play className="w-6 h-6" />}
           label="Play"
-          onClick={() => onNavigate('play')}
+          onClick={onNavigate}
           delay={0.3}
         />
         <MenuButton
           icon={<Settings className="w-6 h-6" />}
           label="Settings"
-          onClick={() => onNavigate('settings')}
+          onClick={onSettings}
           delay={0.4}
         />
         <MenuButton
           icon={<Info className="w-6 h-6" />}
           label="About"
-          onClick={() => onNavigate('about')}
+          onClick={onAbout}
           delay={0.5}
         />
       </motion.div>
