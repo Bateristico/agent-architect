@@ -1,73 +1,77 @@
-# React + TypeScript + Vite
+# Agent Architect
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An educational card game that teaches AI/Agent system design through puzzle-solving gameplay.
 
-Currently, two official plugins are available:
+## 🎮 About
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Learn AI best practices by designing agent architectures with cards! Build systems using Context, Model, Tool, Framework, and Guardrail cards, then see immediate feedback through simulated test cases.
 
-## React Compiler
+### Learning Paths
+- 📚 **Beginner Architect** - Context, models, basic tools
+- 🔍 **RAG Specialist** - Retrieval strategies, data sources
+- 🤖 **Agentic Developer** - Frameworks, tool orchestration
+- 🚀 **Production Engineer** - Optimization, cost, scale
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🚀 Quick Start
 
-## Expanding the ESLint configuration
+### Prerequisites
+- Node.js 16+
+- npm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/agent-architect.git
+cd agent-architect
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Install dependencies
+npm install
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start development server
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Visit [http://localhost:5173](http://localhost:5173) to play!
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## 🛠 Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **React 18** + TypeScript
+- **Vite** - Lightning fast dev server
+- **Tailwind CSS** - Utility-first styling
+- **Framer Motion** - Smooth animations
+- **Zustand** - State management (coming in Iteration 2)
+- **Local Storage** - Progress persistence
+
+## 📦 Development
+
+```bash
+# Start dev server with hot reload
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm run preview
 ```
+
+## 🎯 Progress
+
+- ✅ **Iteration 1**: Main menu and navigation (COMPLETE)
+- ⏳ **Iteration 2**: State management and level selection (Next)
+- ⏳ **Iteration 3**: Game board and cards
+- ⏳ **Iteration 4**: Drag and drop mechanics
+- ⏳ **Iteration 5**: Game logic and scoring
+
+## 📝 License
+
+MIT License - feel free to use and modify!
+
+## 💡 Inspiration
+
+Inspired by AWS Card Clash - bringing puzzle-based learning to AI/Agent architecture.
+
+---
+
+**Made with ❤️ for the AI community**
