@@ -67,7 +67,7 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick, onCardRemove, 
         </div>
 
         {/* Row 1: Context & Model */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <BoardSlot
             slotType="context"
             config={SLOT_CONFIG.context}
@@ -94,7 +94,7 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick, onCardRemove, 
         </div>
 
         {/* Row 2: Tools, Framework, Guardrails */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-3 gap-4 mb-4">
           <BoardSlot
             slotType="tools"
             config={SLOT_CONFIG.tools}
