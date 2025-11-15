@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Target, Clock, DollarSign } from 'lucide-react';
 import { Board } from '../components/Board';
@@ -39,7 +39,46 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
     guardrails: { type: 'guardrails', card: null, required: false },
   });
   const [energyRemaining, setEnergyRemaining] = useState(MOCK_LEVEL.energyBudget);
+  const [mouseY, setMouseY] = useState(0);
   const slotRefs = useRef<Record<string, HTMLElement | null>>({});
+  const scrollIntervalRef = useRef<number | null>(null);
+
+  // Auto-scroll effect when dragging near screen edges
+  useEffect(() => {
+    if (!draggedCard) {
+      if (scrollIntervalRef.current) {
+        clearInterval(scrollIntervalRef.current);
+        scrollIntervalRef.current = null;
+      }
+      return;
+    }
+
+    const handleMouseMove = (e: MouseEvent) => {
+      setMouseY(e.clientY);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    // Set up scroll interval
+    scrollIntervalRef.current = window.setInterval(() => {
+      const scrollThreshold = 100;
+      const scrollSpeed = 5;
+      const viewportHeight = window.innerHeight;
+
+      if (mouseY < scrollThreshold && mouseY > 0) {
+        window.scrollBy({ top: -scrollSpeed, behavior: 'auto' });
+      } else if (mouseY > viewportHeight - scrollThreshold) {
+        window.scrollBy({ top: scrollSpeed, behavior: 'auto' });
+      }
+    }, 16); // ~60fps
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (scrollIntervalRef.current) {
+        clearInterval(scrollIntervalRef.current);
+      }
+    };
+  }, [draggedCard, mouseY]);
 
   // Get valid slots for the dragged card
   const getValidSlots = (card: ICard | null): (keyof IBoard)[] => {
@@ -64,17 +103,6 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   const handleDragEnd = (card: ICard, _event: any, info: any) => {
     const { point } = info;
     let droppedOnSlot: keyof IBoard | null = null;
-
-    // Auto-scroll logic - scroll page when dragging near top/bottom edges
-    const scrollThreshold = 100;
-    const scrollSpeed = 10;
-    const viewportHeight = window.innerHeight;
-
-    if (point.y < scrollThreshold) {
-      window.scrollBy({ top: -scrollSpeed, behavior: 'smooth' });
-    } else if (point.y > viewportHeight - scrollThreshold) {
-      window.scrollBy({ top: scrollSpeed, behavior: 'smooth' });
-    }
 
     // Check which slot the card was dropped on
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
@@ -263,7 +291,10 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
             </div>
           ) : (
             <div className="relative">
-              <div className="flex gap-6 overflow-x-auto pb-2" style={{ overflow: 'visible' }}>
+              <div
+                className="flex justify-center items-center gap-4 pb-2 flex-wrap"
+                style={{ overflow: 'visible', minHeight: '220px' }}
+              >
                 {hand.map((card, index) => (
                   <motion.div
                     key={card.id}
