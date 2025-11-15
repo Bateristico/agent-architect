@@ -72,7 +72,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onBack }) => {
           {/* GitHub Link */}
           <div className="text-center">
             <a
-              href="https://github.com/yourusername/agent-architect"
+              href="https://github.com/Bateristico/agent-architect"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20

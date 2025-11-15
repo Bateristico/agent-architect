@@ -22,7 +22,7 @@ Learn AI best practices by designing agent architectures with cards! Build syste
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/agent-architect.git
+git clone https://github.com/Bateristico/agent-architect.git
 cd agent-architect
 
 # Install dependencies
