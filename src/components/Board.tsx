@@ -6,6 +6,8 @@ import type { IBoard } from '../game/types';
 interface BoardProps {
   board: IBoard;
   onSlotClick?: (slotType: keyof IBoard) => void;
+  onCardRemove?: (slotType: keyof IBoard) => void;
+  highlightedSlots?: (keyof IBoard)[];
 }
 
 const SLOT_CONFIG = {
@@ -41,7 +43,7 @@ const SLOT_CONFIG = {
   },
 };
 
-export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
+export const Board: React.FC<BoardProps> = ({ board, onSlotClick, onCardRemove, highlightedSlots = [] }) => {
   return (
     <div className="w-full max-w-4xl mx-auto p-6 bg-white/5 backdrop-blur-sm border-2 border-white/10 rounded-lg">
       {/* Title */}
@@ -72,6 +74,8 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
             card={board.context.card}
             required={board.context.required}
             onClick={() => onSlotClick?.('context')}
+            onRemove={() => onCardRemove?.('context')}
+            isHighlighted={highlightedSlots.includes('context')}
           />
           <BoardSlot
             slotType="model"
@@ -79,6 +83,8 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
             card={board.model.card}
             required={board.model.required}
             onClick={() => onSlotClick?.('model')}
+            onRemove={() => onCardRemove?.('model')}
+            isHighlighted={highlightedSlots.includes('model')}
           />
         </div>
 
@@ -95,6 +101,8 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
             card={board.tools.card}
             required={board.tools.required}
             onClick={() => onSlotClick?.('tools')}
+            onRemove={() => onCardRemove?.('tools')}
+            isHighlighted={highlightedSlots.includes('tools')}
           />
           <BoardSlot
             slotType="framework"
@@ -102,6 +110,8 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
             card={board.framework.card}
             required={board.framework.required}
             onClick={() => onSlotClick?.('framework')}
+            onRemove={() => onCardRemove?.('framework')}
+            isHighlighted={highlightedSlots.includes('framework')}
           />
           <BoardSlot
             slotType="guardrails"
@@ -109,6 +119,8 @@ export const Board: React.FC<BoardProps> = ({ board, onSlotClick }) => {
             card={board.guardrails.card}
             required={board.guardrails.required}
             onClick={() => onSlotClick?.('guardrails')}
+            onRemove={() => onCardRemove?.('guardrails')}
+            isHighlighted={highlightedSlots.includes('guardrails')}
           />
         </div>
 
@@ -134,26 +146,45 @@ interface BoardSlotProps {
   card: any;
   required: boolean;
   onClick: () => void;
+  onRemove: () => void;
+  isHighlighted: boolean;
 }
 
-const BoardSlot: React.FC<BoardSlotProps> = ({ config, card, required, onClick }) => {
+const BoardSlot: React.FC<BoardSlotProps> = ({ slotType, config, card, required, onClick, onRemove, isHighlighted }) => {
   const Icon = config.icon;
 
   return (
     <motion.div
+      data-slot={slotType}
       whileHover={{ scale: 1.02 }}
       onClick={onClick}
       className={`
         relative min-h-[240px] rounded-lg border-2 ${config.color}
         flex flex-col items-center justify-center p-4
         ${!card ? 'cursor-pointer hover:border-white/40' : ''}
+        ${isHighlighted ? 'ring-4 ring-white/60 ring-offset-2 ring-offset-transparent shadow-xl' : ''}
         transition-all
       `}
     >
+      {/* Highlight indicator when dragging */}
+      {isHighlighted && !card && (
+        <div className="absolute inset-0 bg-white/10 rounded-lg animate-pulse" />
+      )}
+
       {card ? (
         // Show placed card
-        <div className="flex items-center justify-center">
+        <div className="relative flex items-center justify-center">
           <Card card={card} isInHand={false} />
+          {/* Remove button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow-lg transition-all z-10"
+          >
+            ×
+          </button>
         </div>
       ) : (
         // Show empty slot
@@ -166,7 +197,9 @@ const BoardSlot: React.FC<BoardSlotProps> = ({ config, card, required, onClick }
           <div className="mt-2 w-16 h-16 border-2 border-dashed border-white/20 rounded-lg mx-auto flex items-center justify-center">
             <span className="text-white/40 text-3xl">?</span>
           </div>
-          <p className="text-white/40 text-xs mt-2">Click to place card</p>
+          <p className="text-white/40 text-xs mt-2">
+            {isHighlighted ? 'Drop card here' : 'Drag card here'}
+          </p>
         </div>
       )}
     </motion.div>

@@ -6,6 +6,9 @@ interface CardProps {
   card: ICard;
   onClick?: () => void;
   isInHand?: boolean;
+  onDragStart?: () => void;
+  onDragEnd?: (event: any, info: any) => void;
+  isDragging?: boolean;
 }
 
 const CARD_COLORS: Record<string, { gradient: string; border: string; icon: string }> = {
@@ -44,19 +47,33 @@ const CARD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = 
   guardrail: Shield,
 };
 
-export const Card: React.FC<CardProps> = ({ card, onClick, isInHand = true }) => {
+export const Card: React.FC<CardProps> = ({
+  card,
+  onClick,
+  isInHand = true,
+  onDragStart,
+  onDragEnd,
+  isDragging = false,
+}) => {
   const colors = CARD_COLORS[card.type];
   const Icon = CARD_ICONS[card.type];
 
   return (
     <motion.div
+      drag={isInHand}
+      dragConstraints={{ left: 0, right: 0, top: 0, bottom: 0 }}
+      dragElastic={0.1}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
       whileHover={isInHand ? { scale: 1.05, y: -5 } : {}}
       whileTap={isInHand ? { scale: 0.95 } : {}}
+      whileDrag={{ scale: 1.1, rotate: 5, zIndex: 100 }}
       onClick={onClick}
       className={`
         relative w-[150px] h-[200px] rounded-lg overflow-hidden
-        ${isInHand ? 'cursor-pointer' : 'cursor-default'}
+        ${isInHand ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
         shadow-lg hover:shadow-xl transition-shadow
+        ${isDragging ? 'shadow-2xl' : ''}
       `}
     >
       {/* Card Background with Gradient */}

@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Target, Clock, DollarSign } from 'lucide-react';
 import { Board } from '../components/Board';
-import { Hand } from '../components/Hand';
+import { Card } from '../components/Card';
 import { CARDS } from '../game/cards';
 import type { IBoard, ICard } from '../game/types';
 
@@ -26,6 +26,7 @@ const MOCK_LEVEL = {
 };
 
 export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
+  const [draggedCard, setDraggedCard] = useState<ICard | null>(null);
   const [selectedCard, setSelectedCard] = useState<ICard | null>(null);
   const [hand, setHand] = useState<ICard[]>(
     MOCK_LEVEL.startingHand.map(id => CARDS[id]).filter(Boolean)
@@ -38,6 +39,73 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
     guardrails: { type: 'guardrails', card: null, required: false },
   });
   const [energyRemaining, setEnergyRemaining] = useState(MOCK_LEVEL.energyBudget);
+  const slotRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Get valid slots for the dragged card
+  const getValidSlots = (card: ICard | null): (keyof IBoard)[] => {
+    if (!card) return [];
+    switch (card.type) {
+      case 'context': return ['context'];
+      case 'model': return ['model'];
+      case 'tool': return ['tools'];
+      case 'framework': return ['framework'];
+      case 'guardrail': return ['guardrails'];
+      default: return [];
+    }
+  };
+
+  // Handle card drag start
+  const handleDragStart = (card: ICard) => {
+    setDraggedCard(card);
+    setSelectedCard(card);
+  };
+
+  // Handle card drag end
+  const handleDragEnd = (card: ICard, event: any, info: any) => {
+    const { point } = info;
+    let droppedOnSlot: keyof IBoard | null = null;
+
+    // Check which slot the card was dropped on
+    for (const [slotType, element] of Object.entries(slotRefs.current)) {
+      if (!element) continue;
+      const rect = element.getBoundingClientRect();
+      if (point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom) {
+        droppedOnSlot = slotType as keyof IBoard;
+        break;
+      }
+    }
+
+    if (droppedOnSlot) {
+      handleCardPlace(card, droppedOnSlot);
+    }
+    setDraggedCard(null);
+  };
+
+  // Handle placing a card in a slot
+  const handleCardPlace = (card: ICard, slotType: keyof IBoard) => {
+    const validSlots = getValidSlots(card);
+    if (!validSlots.includes(slotType)) {
+      alert(`Cannot place ${card.type} card in ${slotType} slot`);
+      return;
+    }
+    if (card.energyCost > energyRemaining) {
+      alert('Not enough energy!');
+      return;
+    }
+
+    const slot = board[slotType];
+    // If slot already has a card, return it to hand
+    if (slot.card) {
+      setHand([...hand, slot.card]);
+      setEnergyRemaining(energyRemaining + slot.card.energyCost);
+    }
+
+    // Place new card
+    setBoard({ ...board, [slotType]: { ...slot, card } });
+    setHand(hand.filter(c => c.id !== card.id));
+    setEnergyRemaining(energyRemaining - card.energyCost);
+    setSelectedCard(null);
+  };
 
   const handleCardClick = (card: ICard) => {
     if (card.energyCost <= energyRemaining) {
@@ -46,41 +114,26 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   };
 
   const handleSlotClick = (slotType: keyof IBoard) => {
-    if (!selectedCard) return;
+    if (selectedCard) {
+      handleCardPlace(selectedCard, slotType);
+    }
+  };
 
-    // Check if card type matches slot (with some flexibility)
+  // Handle removing a card from a slot
+  const handleCardRemove = (slotType: keyof IBoard) => {
     const slot = board[slotType];
-    const canPlace =
-      (slotType === 'context' && selectedCard.type === 'context') ||
-      (slotType === 'model' && selectedCard.type === 'model') ||
-      (slotType === 'tools' && selectedCard.type === 'tool') ||
-      (slotType === 'framework' && selectedCard.type === 'framework') ||
-      (slotType === 'guardrails' && selectedCard.type === 'guardrail');
+    if (!slot.card) return;
 
-    if (!canPlace) {
-      alert(`Cannot place ${selectedCard.type} card in ${slotType} slot`);
-      return;
-    }
+    // Return card to hand and refund energy
+    setHand([...hand, slot.card]);
+    setEnergyRemaining(energyRemaining + slot.card.energyCost);
 
-    // If slot already has a card, return it to hand
-    if (slot.card) {
-      setHand([...hand, slot.card]);
-      setEnergyRemaining(energyRemaining + slot.card.energyCost);
-    }
-
-    // Place new card
-    setBoard({
-      ...board,
-      [slotType]: { ...slot, card: selectedCard },
-    });
-
-    // Remove card from hand and deduct energy
-    setHand(hand.filter(c => c.id !== selectedCard.id));
-    setEnergyRemaining(energyRemaining - selectedCard.energyCost);
-    setSelectedCard(null);
+    // Clear slot
+    setBoard({ ...board, [slotType]: { ...slot, card: null } });
   };
 
   const canSubmit = board.context.card !== null && board.model.card !== null;
+  const highlightedSlots = getValidSlots(draggedCard);
 
   return (
     <div className="min-h-screen flex flex-col px-4 py-8">
@@ -156,24 +209,83 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
         className="mb-6"
+        ref={(el) => {
+          if (el) {
+            // Store refs for all slots for drop detection
+            Object.keys(board).forEach(slotType => {
+              const slotEl = el.querySelector(`[data-slot="${slotType}"]`);
+              if (slotEl) slotRefs.current[slotType] = slotEl as HTMLElement;
+            });
+          }
+        }}
       >
-        <Board board={board} onSlotClick={handleSlotClick} />
+        <Board
+          board={board}
+          onSlotClick={handleSlotClick}
+          onCardRemove={handleCardRemove}
+          highlightedSlots={highlightedSlots}
+        />
       </motion.div>
 
-      {/* Hand */}
+      {/* Hand - with draggable cards */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
         className="mb-6"
       >
-        <Hand
-          cards={hand}
-          energyRemaining={energyRemaining}
-          energyBudget={MOCK_LEVEL.energyBudget}
-          onCardClick={handleCardClick}
-          selectedCardId={selectedCard?.id}
-        />
+        <div className="w-full bg-white/5 backdrop-blur-sm border-2 border-white/10 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-white font-semibold text-lg">Your Hand</h3>
+            <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
+              <DollarSign className="w-5 h-5 text-yellow-300" />
+              <span className="text-white font-bold">
+                {energyRemaining} / {MOCK_LEVEL.energyBudget}
+              </span>
+              <span className="text-white/60 text-sm">Energy</span>
+            </div>
+          </div>
+
+          {hand.length === 0 ? (
+            <div className="text-center py-8 text-white/40">
+              No cards in hand
+            </div>
+          ) : (
+            <div className="flex gap-4 overflow-x-auto pb-2">
+              {hand.map((card, index) => (
+                <motion.div
+                  key={card.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex-shrink-0 relative"
+                >
+                  <Card
+                    card={card}
+                    onClick={() => handleCardClick(card)}
+                    onDragStart={() => handleDragStart(card)}
+                    onDragEnd={(event, info) => handleDragEnd(card, event, info)}
+                    isDragging={draggedCard?.id === card.id}
+                    isInHand={true}
+                  />
+                  {card.energyCost > energyRemaining && (
+                    <div className="absolute inset-0 bg-black/60 rounded-lg flex items-center justify-center pointer-events-none">
+                      <span className="text-red-300 font-bold text-sm">
+                        Not Enough Energy
+                      </span>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 text-center text-white/60 text-sm">
+            {draggedCard
+              ? 'Drop card on a highlighted slot or click a slot to place it'
+              : 'Drag cards to slots or click to select, then click a slot'}
+          </div>
+        </div>
       </motion.div>
 
       {/* Submit Button */}
