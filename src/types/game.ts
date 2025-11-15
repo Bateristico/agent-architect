@@ -1,5 +1,5 @@
 // Learning Path Types
-export type PathId = 'beginner' | 'rag' | 'agentic' | 'production';
+export type PathId = 'beginner-architect' | 'rag-specialist' | 'agentic-developer' | 'production-engineer';
 
 export interface LearningPath {
   id: PathId;

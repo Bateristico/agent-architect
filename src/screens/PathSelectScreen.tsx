@@ -10,7 +10,7 @@ interface PathSelectScreenProps {
 
 const learningPaths: LearningPath[] = [
   {
-    id: 'beginner',
+    id: 'beginner-architect',
     name: 'Beginner Architect',
     description: 'Learn the fundamentals: Context, models, and basic tools',
     icon: 'BookOpen',
@@ -18,7 +18,7 @@ const learningPaths: LearningPath[] = [
     levels: [1, 2, 3],
   },
   {
-    id: 'rag',
+    id: 'rag-specialist',
     name: 'RAG Specialist',
     description: 'Master retrieval strategies and data sources',
     icon: 'Search',
@@ -26,7 +26,7 @@ const learningPaths: LearningPath[] = [
     levels: [4, 5, 6],
   },
   {
-    id: 'agentic',
+    id: 'agentic-developer',
     name: 'Agentic Developer',
     description: 'Build with frameworks and tool orchestration',
     icon: 'Bot',
@@ -34,7 +34,7 @@ const learningPaths: LearningPath[] = [
     levels: [7, 8, 9],
   },
   {
-    id: 'production',
+    id: 'production-engineer',
     name: 'Production Engineer',
     description: 'Optimize for cost, performance, and scale',
     icon: 'Rocket',
