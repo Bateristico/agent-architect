@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Lock, Star, CheckCircle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
+import { getLevelsByPath } from '../content';
 import type { PathId, Level } from '../types/game';
 
 interface LevelSelectScreenProps {
@@ -9,143 +10,19 @@ interface LevelSelectScreenProps {
   onSelectLevel: (levelId: number) => void;
 }
 
-// Mock level data - will be replaced with actual level content in later iterations
-const levelData: Record<PathId, Level[]> = {
-  beginner: [
-    {
-      id: 1,
-      pathId: 'beginner',
-      title: 'First Steps',
-      description: 'Learn basic context and model selection',
-      difficulty: 'easy',
-      isUnlocked: true,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 2,
-      pathId: 'beginner',
-      title: 'Building Blocks',
-      description: 'Combine context with simple tools',
-      difficulty: 'easy',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 3,
-      pathId: 'beginner',
-      title: 'System Design',
-      description: 'Create your first complete agent system',
-      difficulty: 'medium',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-  ],
-  rag: [
-    {
-      id: 4,
-      pathId: 'rag',
-      title: 'Retrieval Basics',
-      description: 'Understanding vector databases and embeddings',
-      difficulty: 'medium',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 5,
-      pathId: 'rag',
-      title: 'Data Sources',
-      description: 'Integrate multiple knowledge sources',
-      difficulty: 'medium',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 6,
-      pathId: 'rag',
-      title: 'Advanced RAG',
-      description: 'Master hybrid search and reranking',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-  ],
-  agentic: [
-    {
-      id: 7,
-      pathId: 'agentic',
-      title: 'Framework Fundamentals',
-      description: 'Choose the right framework for your task',
-      difficulty: 'medium',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 8,
-      pathId: 'agentic',
-      title: 'Tool Orchestration',
-      description: 'Coordinate multiple tools effectively',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 9,
-      pathId: 'agentic',
-      title: 'Multi-Agent Systems',
-      description: 'Build systems with multiple cooperating agents',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-  ],
-  production: [
-    {
-      id: 10,
-      pathId: 'production',
-      title: 'Cost Optimization',
-      description: 'Balance performance with budget constraints',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 11,
-      pathId: 'production',
-      title: 'Scale & Performance',
-      description: 'Handle high-volume production workloads',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-    {
-      id: 12,
-      pathId: 'production',
-      title: 'Guardrails & Safety',
-      description: 'Implement comprehensive safety measures',
-      difficulty: 'hard',
-      isUnlocked: false,
-      isCompleted: false,
-      stars: 0,
-    },
-  ],
+// Mock level data for paths not yet implemented (will be replaced in future iterations)
+const mockLevelData: Record<PathId, Level[]> = {
+  'beginner-architect': [], // Uses actual content from getLevelsByPath
+  'rag-specialist': [], // To be implemented
+  'agentic-developer': [], // To be implemented
+  'production-engineer': [], // To be implemented
 };
 
 const pathNames: Record<PathId, string> = {
-  beginner: 'Beginner Architect',
-  rag: 'RAG Specialist',
-  agentic: 'Agentic Developer',
-  production: 'Production Engineer',
+  'beginner-architect': 'Beginner Architect',
+  'rag-specialist': 'RAG Specialist',
+  'agentic-developer': 'Agentic Developer',
+  'production-engineer': 'Production Engineer',
 };
 
 const difficultyColors = {
@@ -160,7 +37,23 @@ export const LevelSelectScreen: React.FC<LevelSelectScreenProps> = ({
   onSelectLevel,
 }) => {
   const { progress } = useGameStore();
-  const levels = levelData[pathId];
+
+  // Get actual levels from content system
+  const contentLevels = getLevelsByPath(pathId);
+
+  // Convert to Level format for UI
+  const levels: Level[] = contentLevels.length > 0
+    ? contentLevels.map(level => ({
+        id: level.number,
+        pathId: pathId,
+        title: level.title,
+        description: level.scenario.split('.')[0], // First sentence as description
+        difficulty: level.difficulty,
+        isUnlocked: progress.unlockedLevels.includes(level.number),
+        isCompleted: progress.completedLevels.includes(level.number),
+        stars: progress.levelStars[level.number] || 0,
+      }))
+    : mockLevelData[pathId] || [];
 
   return (
     <div className="min-h-screen flex flex-col px-4 py-8">

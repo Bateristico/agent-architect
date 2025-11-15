@@ -4,45 +4,44 @@ import { ArrowLeft, Target, Clock, DollarSign } from 'lucide-react';
 import { Board } from '../components/Board';
 import { Card } from '../components/Card';
 import { CARDS } from '../game/cards';
+import { getLevelByNumber } from '../content';
+import { useGameStore } from '../store/gameStore';
 import type { IBoard, ICard } from '../game/types';
 
 interface GameScreenProps {
   onBack: () => void;
+  onSubmit?: (board: IBoard) => void;
 }
 
-// Mock level data for now
-const MOCK_LEVEL = {
-  id: 1,
-  title: 'Customer Support Assistant',
-  difficulty: 'easy' as const,
-  scenario: 'Build an AI agent to handle basic customer support questions. The agent should be able to answer common questions about products, shipping, and returns with high accuracy.',
-  successCriteria: {
-    accuracy: 85,
-    maxLatency: 2000,
-    maxCost: 10,
-  },
-  startingHand: ['context-basic', 'context-detailed', 'model-gpt35', 'model-gpt4', 'tool-search', 'tool-database', 'framework-sequential'],
-  energyBudget: 10,
-};
+export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
+  const { progress } = useGameStore();
 
-export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
+  // Load current level data
+  const currentLevel = progress.currentLevel ? getLevelByNumber(progress.currentLevel) : null;
+
+  // Fallback to Level 1 if no level is set
+  const levelData = currentLevel || getLevelByNumber(1);
+
+  if (!levelData) {
+    return <div className="min-h-screen flex items-center justify-center text-white">Level not found</div>;
+  }
+
   const [draggedCard, setDraggedCard] = useState<ICard | null>(null);
   const [selectedCard, setSelectedCard] = useState<ICard | null>(null);
   const [hand, setHand] = useState<ICard[]>(
-    MOCK_LEVEL.startingHand.map(id => CARDS[id]).filter(Boolean)
+    levelData.availableCards.map((id: string) => CARDS[id]).filter(Boolean)
   );
   const [board, setBoard] = useState<IBoard>({
-    context: { type: 'context', card: null, required: true },
-    model: { type: 'model', card: null, required: true },
-    tools: { type: 'tools', card: null, required: false },
-    framework: { type: 'framework', card: null, required: false },
-    guardrails: { type: 'guardrails', card: null, required: false },
+    context: { type: 'context', card: null, required: levelData.requiredSlots.context },
+    model: { type: 'model', card: null, required: levelData.requiredSlots.model },
+    tools: { type: 'tools', card: null, required: levelData.requiredSlots.tools },
+    framework: { type: 'framework', card: null, required: levelData.requiredSlots.framework },
+    guardrails: { type: 'guardrails', card: null, required: levelData.requiredSlots.guardrails },
   });
-  const [energyRemaining, setEnergyRemaining] = useState(MOCK_LEVEL.energyBudget);
+  const [energyRemaining, setEnergyRemaining] = useState(levelData.energyBudget);
   const [mouseY, setMouseY] = useState(0);
   const slotRefs = useRef<Record<string, HTMLElement | null>>({});
   const scrollIntervalRef = useRef<number | null>(null);
-  const dragPointRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   // Auto-scroll effect when dragging near screen edges
   useEffect(() => {
@@ -100,68 +99,57 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
     setSelectedCard(card);
   };
 
-  // Handle card drag (while dragging)
-  const handleDrag = (_event: any, info: any) => {
-    const { point } = info;
-    dragPointRef.current = point;
-  };
-
   // Handle card drag end
-  const handleDragEnd = (card: ICard, event: any, info: any) => {
-    const { point } = info;
+  const handleDragEnd = (card: ICard, event: any) => {
+    // Use the mouse position from the actual mouse event instead of Framer's transform-based point
+    const mouseEvent = event as MouseEvent;
+    const mouseX = mouseEvent.clientX;
+    const mouseY = mouseEvent.clientY;
+
     let droppedOnSlot: keyof IBoard | null = null;
-    let minDistance = Infinity;
+    let maxOverlap = 0;
 
-    console.log('=== DROP DEBUG ===');
-    console.log('Drop point (viewport):', point);
-    console.log('Window scroll:', { x: window.scrollX, y: window.scrollY });
-    console.log('Card:', card.name, 'Type:', card.type);
-
-    // Adjust point for page scroll - Framer Motion gives viewport coordinates
-    const adjustedPoint = {
-      x: point.x,
-      y: point.y + window.scrollY,  // Add scroll offset
+    // Calculate card bounds based on MOUSE position (150x200 card size, scaled by 1.1 during drag)
+    const cardWidth = 150 * 1.1;
+    const cardHeight = 200 * 1.1;
+    const cardRect = {
+      left: mouseX - cardWidth / 2,
+      right: mouseX + cardWidth / 2,
+      top: mouseY - cardHeight / 2,
+      bottom: mouseY + cardHeight / 2,
     };
 
-    console.log('Adjusted drop point (page):', adjustedPoint);
+    // Get valid slots for this card type
+    const validSlots = getValidSlots(card);
 
-    // Find the closest slot to the drop point
+    // Find the slot with maximum overlap
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
       if (!element) continue;
+
+      // Skip if not a valid slot for this card type
+      if (!validSlots.includes(slotType as keyof IBoard)) continue;
+
       const rect = element.getBoundingClientRect();
 
-      // Adjust rect for scroll position
-      const adjustedRect = {
-        left: rect.left,
-        right: rect.right,
-        top: rect.top + window.scrollY,
-        bottom: rect.bottom + window.scrollY,
-        width: rect.width,
-        height: rect.height,
-      };
+      // Calculate overlap between card and slot
+      const overlapLeft = Math.max(cardRect.left, rect.left);
+      const overlapRight = Math.min(cardRect.right, rect.right);
+      const overlapTop = Math.max(cardRect.top, rect.top);
+      const overlapBottom = Math.min(cardRect.bottom, rect.bottom);
 
-      console.log(`Slot ${slotType} (adjusted):`, adjustedRect);
+      // Check if there is any overlap
+      if (overlapLeft < overlapRight && overlapTop < overlapBottom) {
+        const overlapWidth = overlapRight - overlapLeft;
+        const overlapHeight = overlapBottom - overlapTop;
+        const overlapArea = overlapWidth * overlapHeight;
 
-      // Check if point is within the slot bounds
-      if (adjustedPoint.x >= adjustedRect.left && adjustedPoint.x <= adjustedRect.right &&
-          adjustedPoint.y >= adjustedRect.top && adjustedPoint.y <= adjustedRect.bottom) {
-        // Calculate distance to center of slot
-        const centerX = adjustedRect.left + adjustedRect.width / 2;
-        const centerY = adjustedRect.top + adjustedRect.height / 2;
-        const distance = Math.sqrt(Math.pow(adjustedPoint.x - centerX, 2) + Math.pow(adjustedPoint.y - centerY, 2));
-
-        console.log(`  -> Point is inside ${slotType}, distance to center: ${distance}`);
-
-        // Use the slot with the closest center
-        if (distance < minDistance) {
-          minDistance = distance;
+        // Use the slot with the largest overlap
+        if (overlapArea > maxOverlap) {
+          maxOverlap = overlapArea;
           droppedOnSlot = slotType as keyof IBoard;
         }
       }
     }
-
-    console.log('Final detected slot:', droppedOnSlot);
-    console.log('==================');
 
     if (droppedOnSlot) {
       handleCardPlace(card, droppedOnSlot);
@@ -240,8 +228,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
         </button>
 
         <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
-          <span className="text-white/60 text-sm">Level {MOCK_LEVEL.id}</span>
-          <span className="text-white font-semibold">{MOCK_LEVEL.difficulty.toUpperCase()}</span>
+          <span className="text-white/60 text-sm">Level {levelData.number}</span>
+          <span className="text-white font-semibold">{levelData.difficulty.toUpperCase()}</span>
         </div>
       </motion.div>
 
@@ -253,12 +241,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
         className="mb-6"
       >
         <h1 className="text-4xl font-bold text-white mb-4 text-center">
-          {MOCK_LEVEL.title}
+          {levelData.title}
         </h1>
 
         <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-lg p-6 max-w-4xl mx-auto">
           <h2 className="text-xl font-semibold text-white mb-3">Scenario</h2>
-          <p className="text-white/80 mb-4">{MOCK_LEVEL.scenario}</p>
+          <p className="text-white/80 mb-4">{levelData.scenario}</p>
 
           <h3 className="text-lg font-semibold text-white mb-3">Success Criteria</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -266,24 +254,24 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
               <Target className="w-6 h-6 text-green-300" />
               <div>
                 <div className="text-white/60 text-sm">Accuracy</div>
-                <div className="text-white font-bold">{MOCK_LEVEL.successCriteria.accuracy}%</div>
+                <div className="text-white font-bold">{levelData.successCriteria.accuracy}%</div>
               </div>
             </div>
-            {MOCK_LEVEL.successCriteria.maxLatency && (
+            {levelData.successCriteria.maxLatency && (
               <div className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
                 <Clock className="w-6 h-6 text-blue-300" />
                 <div>
                   <div className="text-white/60 text-sm">Max Latency</div>
-                  <div className="text-white font-bold">{MOCK_LEVEL.successCriteria.maxLatency}ms</div>
+                  <div className="text-white font-bold">{levelData.successCriteria.maxLatency}ms</div>
                 </div>
               </div>
             )}
-            {MOCK_LEVEL.successCriteria.maxCost && (
+            {levelData.successCriteria.maxCost && (
               <div className="flex items-center gap-3 bg-white/5 rounded-lg p-3">
                 <DollarSign className="w-6 h-6 text-yellow-300" />
                 <div>
                   <div className="text-white/60 text-sm">Max Cost</div>
-                  <div className="text-white font-bold">{MOCK_LEVEL.successCriteria.maxCost} energy</div>
+                  <div className="text-white font-bold">{levelData.successCriteria.maxCost} energy</div>
                 </div>
               </div>
             )}
@@ -328,7 +316,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
             <div className="flex items-center gap-2 bg-white/10 px-4 py-2 rounded-lg">
               <DollarSign className="w-5 h-5 text-yellow-300" />
               <span className="text-white font-bold">
-                {energyRemaining} / {MOCK_LEVEL.energyBudget}
+                {energyRemaining} / {levelData.energyBudget}
               </span>
               <span className="text-white/60 text-sm">Energy</span>
             </div>
@@ -357,7 +345,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
                       card={card}
                       onClick={() => handleCardClick(card)}
                       onDragStart={() => handleDragStart(card)}
-                      onDragEnd={(event, info) => handleDragEnd(card, event, info)}
+                      onDragEnd={(event) => handleDragEnd(card, event)}
                       isDragging={draggedCard?.id === card.id}
                       isInHand={true}
                     />
@@ -390,6 +378,11 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
         className="flex justify-center mb-8"
       >
         <button
+          onClick={() => {
+            if (canSubmit && onSubmit) {
+              onSubmit(board);
+            }
+          }}
           disabled={!canSubmit}
           className={`
             px-8 py-4 rounded-lg font-bold text-lg

@@ -1,6 +1,26 @@
 import type { ICard } from './types';
+import { allCards } from '../content';
 
+// Convert content cards to game cards format
+const convertedCards: Record<string, ICard> = {};
+Object.values(allCards).forEach(card => {
+  convertedCards[card.id] = {
+    id: card.id,
+    name: card.name,
+    type: card.type,
+    energyCost: card.energyCost,
+    description: card.description,
+    pros: card.pros,
+    cons: card.cons,
+    bestFor: card.bestFor,
+    avoidWhen: card.avoidWhen
+  };
+});
+
+// Export cards using the new content structure
 export const CARDS: Record<string, ICard> = {
+  ...convertedCards,
+  // Legacy cards kept for backwards compatibility (can be removed later)
   // CONTEXT CARDS
   'context-basic': {
     id: 'context-basic',
