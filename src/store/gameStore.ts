@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { GameState, PathId } from '../types/game';
+import type { GameState, PathId } from '../types/game';
 
 interface GameStore extends GameState {
   // Actions

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, Lock, Star, CheckCircle } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { PathId, Level } from '../types/game';
+import type { PathId, Level } from '../types/game';
 
 interface LevelSelectScreenProps {
   pathId: PathId;

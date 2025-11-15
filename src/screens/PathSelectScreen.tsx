@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Search, Bot, Rocket } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
-import { LearningPath, PathId } from '../types/game';
+import type { LearningPath, PathId } from '../types/game';
 
 interface PathSelectScreenProps {
   onBack: () => void;
