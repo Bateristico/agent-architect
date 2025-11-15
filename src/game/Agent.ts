@@ -88,10 +88,46 @@ export class Agent {
                              testCase.input?.toLowerCase().includes('order') ||
                              testCase.input?.toLowerCase().includes('transaction');
 
+      // Check for semantic understanding needs (Level 4+)
+      const needsSemanticUnderstanding = testCase.input?.toLowerCase().includes('paraphrase') ||
+                                         testCase.input?.toLowerCase().includes('synonym') ||
+                                         testCase.input?.toLowerCase().includes('meaning') ||
+                                         testCase.input?.toLowerCase().includes('understand') ||
+                                         (testCase.input && testCase.input.length > 50); // Long queries often need semantic
+
+      // Check for calculation needs (Level 7+)
+      const needsCalculation = testCase.input?.toLowerCase().includes('calculate') ||
+                              testCase.input?.toLowerCase().includes('total') ||
+                              testCase.input?.toLowerCase().includes('$') ||
+                              testCase.input?.toLowerCase().includes('discount') ||
+                              /\d+/.test(testCase.input || ''); // Contains numbers
+
       if (needsDataAccess && !this.tools) {
         reasoning.push('Query requires data access but no tools available');
         success = false;
         reason = 'Customer data queries need database tool for accuracy';
+      } else if (needsSemanticUnderstanding && this.tools) {
+        // Check if using appropriate search tool
+        if (this.tools.id === 'tool-semantic-search' || this.tools.id === 'tool-hybrid-search') {
+          reasoning.push(`${this.tools.name} handles semantic queries well`);
+          success = true;
+          reason = 'Semantic search understood the query meaning correctly';
+          latency += 400; // Semantic search adds latency
+        } else if (this.tools.id === 'tool-search') {
+          reasoning.push('Keyword search struggles with semantic queries');
+          success = Math.random() > 0.5; // 50% success with keyword-only
+          reason = success
+            ? 'Keyword search got lucky on this query'
+            : 'Query needs semantic search for reliable understanding';
+        } else {
+          success = Math.random() > 0.4;
+          reason = 'Query benefits from semantic understanding tools';
+        }
+      } else if (needsCalculation && this.tools && this.tools.id === 'tool-code-execution') {
+        reasoning.push('Code execution provides accurate calculations');
+        success = true;
+        reason = 'Code execution delivered perfect accuracy for calculations';
+        latency += 300;
       } else if (this.context.id === 'context-basic') {
         reasoning.push('Basic context insufficient for nuanced query');
         // Can sometimes succeed with tools
@@ -178,8 +214,101 @@ export class Agent {
           }
         }
       } else {
-        // Other hard cases - need detailed context
-        if (this.context.id !== 'context-detailed') {
+        // Other hard cases - check for specific requirements
+        const needsMultiSource = testCase.input?.toLowerCase().includes('multiple') ||
+                                testCase.input?.toLowerCase().includes('both') ||
+                                testCase.input?.toLowerCase().includes('and') ||
+                                testCase.input?.toLowerCase().includes('investigate');
+
+        const needsAgentic = testCase.input?.toLowerCase().includes('troubleshoot') ||
+                            testCase.input?.toLowerCase().includes('systematic') ||
+                            testCase.input?.toLowerCase().includes('diagnose') ||
+                            testCase.input?.toLowerCase().includes('fix');
+
+        const needsMCP = testCase.input?.toLowerCase().includes('service') ||
+                        testCase.input?.toLowerCase().includes('integration') ||
+                        testCase.input?.toLowerCase().includes('coordinate');
+
+        // Multi-source retrieval scenarios
+        if (needsMultiSource && this.tools) {
+          reasoning.push('Multi-source query detected');
+
+          if (this.tools.id === 'tool-hybrid-search' || this.tools.id === 'tool-mcp-interface') {
+            reasoning.push(`${this.tools.name} excels at coordinating multiple sources`);
+
+            if (this.framework && this.framework.id === 'framework-react') {
+              reasoning.push('ReAct framework orchestrates multi-step retrieval');
+              success = true;
+              reason = 'Agent successfully coordinated multiple data sources';
+              latency += 700;
+            } else {
+              success = Math.random() > 0.3;
+              reason = success
+                ? 'Multi-source query handled, though ReAct would improve consistency'
+                : 'Complex multi-source queries benefit from ReAct framework';
+            }
+          } else {
+            success = Math.random() > 0.5;
+            reason = 'Multi-source query partially handled - hybrid search or MCP would be better';
+          }
+        }
+        // Agentic troubleshooting scenarios
+        else if (needsAgentic) {
+          reasoning.push('Agentic reasoning needed for systematic troubleshooting');
+
+          if (this.framework && this.framework.id === 'framework-react') {
+            reasoning.push('ReAct framework provides systematic approach');
+
+            if (this.tools && this.guardrails) {
+              reasoning.push('Tools + guardrails = robust agent');
+              success = true;
+              reason = 'Agent systematically troubleshot the issue with tools and safety';
+              latency += 800;
+            } else if (this.tools) {
+              success = Math.random() > 0.3;
+              reason = success
+                ? 'Agent troubleshot the issue, though guardrails would add robustness'
+                : 'Complex troubleshooting benefits from cascade safety guardrails';
+            } else {
+              success = false;
+              reason = 'Troubleshooting requires tools to gather diagnostic information';
+            }
+          } else if (this.framework && this.framework.id === 'framework-chain-of-thought') {
+            reasoning.push('Chain-of-thought helps but ReAct is better for tools');
+            success = Math.random() > 0.5;
+            reason = success
+              ? 'Chain-of-thought worked for reasoning, though ReAct better for tool use'
+              : 'Troubleshooting scenarios benefit from ReAct over chain-of-thought';
+          } else {
+            success = false;
+            reason = 'Systematic troubleshooting requires agentic framework (ReAct)';
+          }
+        }
+        // MCP/orchestration scenarios
+        else if (needsMCP && this.tools) {
+          reasoning.push('Multi-service orchestration detected');
+
+          if (this.tools.id === 'tool-mcp-interface') {
+            reasoning.push('MCP standardizes multi-service integration');
+
+            if (this.guardrails && (this.guardrails.id === 'guardrail-cascade-safety' || this.guardrails.id === 'guardrail-audit-trail')) {
+              reasoning.push('Production-grade guardrails for enterprise use');
+              success = true;
+              reason = 'MCP + guardrails provides robust enterprise integration';
+              latency += 600;
+            } else {
+              success = Math.random() > 0.4;
+              reason = success
+                ? 'MCP handled integration, though guardrails would improve reliability'
+                : 'Enterprise scenarios benefit from cascade safety and audit trail';
+            }
+          } else {
+            success = Math.random() > 0.6;
+            reason = 'Integration worked but MCP would provide better standardization';
+          }
+        }
+        // Generic hard cases - fallback to previous logic
+        else if (this.context.id !== 'context-detailed') {
           reasoning.push('Insufficient context for complex edge case');
           success = false;
           reason = 'Edge case requires comprehensive context';
@@ -188,24 +317,22 @@ export class Agent {
 
           // Need tools for hard cases
           if (!this.tools) {
-            // Without tools, can still succeed with good setup
-            success = Math.random() > 0.4; // 60% success rate
+            success = Math.random() > 0.4;
             reason = success
               ? 'Agent handled edge case with strong context'
               : 'Hard cases benefit from tool support';
           } else {
             reasoning.push(`${this.tools.name} enables sophisticated handling`);
-            latency += 500; // Complex operations take longer
+            latency += 500;
 
-            // Check for framework - helps with hard cases
+            // Check for framework
             if (this.framework) {
               reasoning.push(`${this.framework.name} provides structure`);
               success = true;
               reason = 'Agent successfully handled edge case with proper architecture';
-              latency += 200; // Framework adds slight latency
+              latency += 200;
             } else {
-              // Can still succeed but less likely
-              success = Math.random() > 0.5; // 50% success rate
+              success = Math.random() > 0.5;
               reason = success
                 ? 'Agent handled edge case, though framework would improve reliability'
                 : 'Edge case needed framework for consistent handling';
