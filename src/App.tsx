@@ -4,6 +4,7 @@ import { SettingsScreen } from './screens/SettingsScreen';
 import { AboutScreen } from './screens/AboutScreen';
 import { PathSelectScreen } from './screens/PathSelectScreen';
 import { LevelSelectScreen } from './screens/LevelSelectScreen';
+import { GameScreen } from './screens/GameScreen';
 import { useGameStore } from './store/gameStore';
 import type { PathId } from './types/game';
 
@@ -55,22 +56,7 @@ function App() {
         />
       )}
       {currentScreen === 'game' && (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">Game Board Coming Soon!</h2>
-            <p className="text-purple-200 mb-6">
-              The game board will be implemented in Iteration 3
-            </p>
-            <button
-              onClick={handleBackToPathSelect}
-              className="bg-white/10 hover:bg-white/20 border-2 border-white/20
-                         hover:border-white/40 rounded-lg px-6 py-3 text-white
-                         font-semibold transition-all"
-            >
-              Back to Levels
-            </button>
-          </div>
-        </div>
+        <GameScreen onBack={handleBackToPathSelect} />
       )}
       {currentScreen === 'settings' && (
         <SettingsScreen onBack={handleBack} />
