@@ -107,35 +107,48 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack }) => {
   };
 
   // Handle card drag end
-  const handleDragEnd = (card: ICard, _event: any, info: any) => {
+  const handleDragEnd = (card: ICard, event: any, info: any) => {
     const { point } = info;
     let droppedOnSlot: keyof IBoard | null = null;
     let minDistance = Infinity;
 
     console.log('=== DROP DEBUG ===');
-    console.log('Drop point:', point);
+    console.log('Drop point (viewport):', point);
+    console.log('Window scroll:', { x: window.scrollX, y: window.scrollY });
     console.log('Card:', card.name, 'Type:', card.type);
+
+    // Adjust point for page scroll - Framer Motion gives viewport coordinates
+    const adjustedPoint = {
+      x: point.x,
+      y: point.y + window.scrollY,  // Add scroll offset
+    };
+
+    console.log('Adjusted drop point (page):', adjustedPoint);
 
     // Find the closest slot to the drop point
     for (const [slotType, element] of Object.entries(slotRefs.current)) {
       if (!element) continue;
       const rect = element.getBoundingClientRect();
 
-      console.log(`Slot ${slotType}:`, {
+      // Adjust rect for scroll position
+      const adjustedRect = {
         left: rect.left,
         right: rect.right,
-        top: rect.top,
-        bottom: rect.bottom,
+        top: rect.top + window.scrollY,
+        bottom: rect.bottom + window.scrollY,
         width: rect.width,
         height: rect.height,
-      });
+      };
+
+      console.log(`Slot ${slotType} (adjusted):`, adjustedRect);
 
       // Check if point is within the slot bounds
-      if (point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom) {
+      if (adjustedPoint.x >= adjustedRect.left && adjustedPoint.x <= adjustedRect.right &&
+          adjustedPoint.y >= adjustedRect.top && adjustedPoint.y <= adjustedRect.bottom) {
         // Calculate distance to center of slot
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        const distance = Math.sqrt(Math.pow(point.x - centerX, 2) + Math.pow(point.y - centerY, 2));
+        const centerX = adjustedRect.left + adjustedRect.width / 2;
+        const centerY = adjustedRect.top + adjustedRect.height / 2;
+        const distance = Math.sqrt(Math.pow(adjustedPoint.x - centerX, 2) + Math.pow(adjustedPoint.y - centerY, 2));
 
         console.log(`  -> Point is inside ${slotType}, distance to center: ${distance}`);
 
