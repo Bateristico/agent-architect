@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Zap } from 'lucide-react';
+import { Zap } from './PixelIcon';
 import { Card } from './Card';
 import type { ICard } from '../game/types';
 
@@ -38,7 +38,7 @@ export const Hand: React.FC<HandProps> = ({
           No cards in hand
         </div>
       ) : (
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex gap-6 overflow-x-auto pb-2 px-2">
           {cards.map((card, index) => (
             <motion.div
               key={card.id}
@@ -46,8 +46,8 @@ export const Hand: React.FC<HandProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
               className={`
-                flex-shrink-0 relative
-                ${selectedCardId === card.id ? 'ring-4 ring-white rounded-lg' : ''}
+                flex-shrink-0 relative p-2
+                ${selectedCardId === card.id ? 'ring-4 ring-white rounded-lg bg-white/5' : ''}
               `}
             >
               <Card

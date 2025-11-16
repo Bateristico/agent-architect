@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Zap, Wrench, GitBranch, Shield, ArrowRight } from 'lucide-react';
+import { MoonStars, Zap, Code, GitBranch, Shield, ArrowRight } from './PixelIcon';
 import { Card } from './Card';
 import type { IBoard } from '../game/types';
 
@@ -13,7 +13,7 @@ interface BoardProps {
 const SLOT_CONFIG = {
   context: {
     label: 'Context',
-    icon: Sparkles,
+    icon: MoonStars,
     color: 'border-blue-400 bg-blue-500/10',
     hoverColor: 'hover:border-blue-300 hover:bg-blue-500/20',
     iconColor: 'text-blue-300',
@@ -29,7 +29,7 @@ const SLOT_CONFIG = {
   },
   tools: {
     label: 'Tools',
-    icon: Wrench,
+    icon: Code,
     color: 'border-teal-400 bg-teal-500/10',
     hoverColor: 'hover:border-teal-300 hover:bg-teal-500/20',
     iconColor: 'text-teal-300',

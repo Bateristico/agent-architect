@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, BookOpen, Search, Bot, Rocket } from 'lucide-react';
+import { ArrowLeft, BookOpen, Search, Code, Rocket } from '../components/PixelIcon';
 import { useGameStore } from '../store/gameStore';
 import type { LearningPath, PathId } from '../types/game';
 import { PixiBackground } from '../components/PixiBackground';
@@ -38,7 +38,7 @@ const learningPaths: LearningPath[] = [
     id: 'agentic-developer',
     name: 'Agentic Developer',
     description: 'Build with frameworks and tool orchestration',
-    icon: 'Bot',
+    icon: 'Code',
     color: 'from-purple-500 to-pink-500',
     levels: [7, 8, 9],
   },
@@ -55,7 +55,7 @@ const learningPaths: LearningPath[] = [
 const iconMap = {
   BookOpen,
   Search,
-  Bot,
+  Code,
   Rocket,
 };
 
@@ -116,21 +116,25 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
           className="text-center mb-16"
         >
           <h1
-            className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight"
+            className="font-bold mb-6 uppercase"
             style={{
+              fontSize: '3rem',
               color: '#ffaa00',
-              textShadow: '4px 4px 0px #000000, 0 0 10px #ffaa00',
-              fontFamily: "'Press Start 2P', monospace"
+              textShadow: '0.25rem 0.25rem 0 #000000, 0 0 0.625rem #ffaa00',
+              fontFamily: "'Press Start 2P', monospace",
+              letterSpacing: '-0.025em'
             }}
           >
             Choose Your Path
           </h1>
           <p
-            className="text-xs md:text-sm font-bold tracking-wide uppercase"
+            className="font-bold uppercase"
             style={{
+              fontSize: '0.875rem',
               color: '#FFFFFF',
-              textShadow: '2px 2px 0px #000000',
-              fontFamily: "'Press Start 2P', monospace"
+              textShadow: '0.125rem 0.125rem 0 #000000',
+              fontFamily: "'Press Start 2P', monospace",
+              letterSpacing: '0.05em'
             }}
           >
             Select a learning path to begin
@@ -142,7 +146,8 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...springConfig, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-6xl mx-auto w-full mb-12"
+          className="grid grid-cols-2 gap-12 max-w-5xl mx-auto w-full mb-12 px-4"
+          style={{ alignItems: 'center' }}
         >
           {learningPaths.map((path, index) => {
             const Icon = iconMap[path.icon as keyof typeof iconMap];
@@ -159,6 +164,7 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
                 completedLevels={completedLevels}
                 totalLevels={totalLevels}
                 index={index}
+                isLeftColumn={index % 2 === 0}
                 onClick={() => handlePathClick(path.id)}
               />
             );
@@ -171,10 +177,12 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8 }}
           className="text-center"
+          style={{ marginTop: '3rem' }}
         >
           <p
-            className="text-xs font-bold uppercase"
+            className="font-bold uppercase"
             style={{
+              fontSize: '0.75rem',
               color: '#d4a5f5',
               fontFamily: "'Silkscreen', monospace"
             }}
@@ -193,6 +201,7 @@ interface PathCardProps {
   completedLevels: number;
   totalLevels: number;
   index: number;
+  isLeftColumn: boolean;
   onClick: () => void;
 }
 
@@ -202,6 +211,7 @@ const PathCard: React.FC<PathCardProps> = ({
   completedLevels,
   totalLevels,
   index,
+  isLeftColumn,
   onClick
 }) => {
   const [isHovered, setIsHovered] = React.useState(false);
@@ -237,77 +247,89 @@ const PathCard: React.FC<PathCardProps> = ({
       onClick={onClick}
       onHoverStart={() => setIsHovered(true)}
       onHoverEnd={() => setIsHovered(false)}
-      className="relative bg-[#2d1b3d]/90 backdrop-blur-sm
-                 p-6 text-left overflow-hidden group"
+      className="relative bg-[#2d1b3d]/90 backdrop-blur-sm text-left overflow-hidden group"
       style={{
-        border: `4px solid ${borderColor}`,
+        padding: '1.5rem',
+        marginLeft: isLeftColumn ? '4rem' : '1rem',
+        marginRight: isLeftColumn ? '1rem' : '4rem',
+        marginTop: '4rem',
+        marginBottom: '4rem',
+        border: `0.25rem solid ${borderColor}`,
         boxShadow: isHovered
-          ? `6px 6px 0px #000000, 0 0 20px ${borderColor}`
-          : `4px 4px 0px #000000`,
-        outline: isHovered ? `2px solid ${borderColor}` : 'none',
+          ? `0.375rem 0.375rem 0 #000000, 0 0 1.25rem ${borderColor}`
+          : `0.25rem 0.25rem 0 #000000`,
+        outline: isHovered ? `0.125rem solid ${borderColor}` : 'none',
         transition: 'box-shadow 150ms ease-out, outline 150ms ease-out',
         cursor: 'pointer'
       }}
     >
       {/* Content */}
       <div className="relative z-10">
-        {/* Icon and Progress */}
-        <div className="flex items-start justify-between mb-4">
-          <div
-            className="p-3 bg-[#4a2859]"
-            style={{
-              border: `4px solid ${borderColor}`,
-              boxShadow: '4px 4px 0px #000000'
-            }}
-          >
-            <Icon className="w-8 h-8 text-white" />
+        {/* Icon, Title and Progress */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="flex-shrink-0 bg-[#4a2859]"
+              style={{
+                padding: '1rem',
+                border: `0.25rem solid ${borderColor}`,
+                boxShadow: '0.25rem 0.25rem 0 #000000'
+              }}
+            >
+              <Icon style={{ width: '3rem', height: '3rem', color: 'white' }} />
+            </div>
+            {/* Title */}
+            <h3
+              className="font-bold uppercase"
+              style={{
+                color: borderColor,
+                textShadow: '0.125rem 0.125rem 0 #000000',
+                fontFamily: "'Press Start 2P', monospace",
+                lineHeight: '1.4',
+                fontSize: '1.25rem',
+                paddingLeft: '0.5rem'
+              }}
+            >
+              {path.name}
+            </h3>
           </div>
           <div
-            className="text-sm font-bold uppercase px-3 py-1 bg-[#4a2859]"
+            className="font-bold uppercase bg-[#4a2859] flex-shrink-0"
             style={{
               color: '#FFFFFF',
-              textShadow: '2px 2px 0px #000000',
-              border: '2px solid #ffffff',
-              boxShadow: '2px 2px 0px #000000',
-              fontFamily: "'Press Start 2P', monospace"
+              textShadow: '0.125rem 0.125rem 0 #000000',
+              border: '0.125rem solid #ffffff',
+              boxShadow: '0.125rem 0.125rem 0 #000000',
+              fontFamily: "'Press Start 2P', monospace",
+              fontSize: '0.875rem',
+              padding: '0.5rem 0.75rem'
             }}
           >
             {completedLevels}/{totalLevels}
           </div>
         </div>
 
-        {/* Title */}
-        <h3
-          className="text-lg md:text-xl font-bold mb-3 uppercase"
-          style={{
-            color: borderColor,
-            textShadow: '2px 2px 0px #000000',
-            fontFamily: "'Press Start 2P', monospace",
-            lineHeight: '1.4'
-          }}
-        >
-          {path.name}
-        </h3>
-
         {/* Description */}
         <p
-          className="text-xs mb-4"
+          className="mb-4"
           style={{
             color: '#d4a5f5',
             fontFamily: "'Silkscreen', monospace",
-            lineHeight: '1.4'
+            lineHeight: '1.4',
+            fontSize: '0.75rem'
           }}
         >
           {path.description}
         </p>
 
         {/* Progress Bar */}
-        <div className="relative">
+        <div>
           <div
-            className="w-full bg-black/50 h-3 overflow-hidden"
+            className="w-full bg-black/50 overflow-hidden"
             style={{
-              border: '2px solid #ffffff',
-              boxShadow: 'inset 2px 2px 0px #000000'
+              height: '0.75rem',
+              border: '0.125rem solid #ffffff',
+              boxShadow: 'inset 0.125rem 0.125rem 0 #000000'
             }}
           >
             <motion.div
@@ -323,13 +345,17 @@ const PathCard: React.FC<PathCardProps> = ({
           </div>
           {/* Progress percentage text */}
           <div
-            className="absolute -top-1 left-1/2 transform -translate-x-1/2 -translate-y-full text-xs font-bold uppercase px-2 py-0.5 bg-[#4a2859]"
+            className="font-bold uppercase bg-[#4a2859]"
             style={{
+              marginTop: '0.5rem',
+              display: 'inline-block',
               color: '#FFFFFF',
-              textShadow: '1px 1px 0px #000000',
-              border: '2px solid #ffffff',
-              boxShadow: '2px 2px 0px #000000',
-              fontFamily: "'Press Start 2P', monospace"
+              textShadow: '0.0625rem 0.0625rem 0 #000000',
+              border: '0.125rem solid #ffffff',
+              boxShadow: '0.125rem 0.125rem 0 #000000',
+              fontFamily: "'Press Start 2P', monospace",
+              fontSize: '0.75rem',
+              padding: '0.375rem 0.5rem'
             }}
           >
             {Math.round((completedLevels / totalLevels) * 100)}%

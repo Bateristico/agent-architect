@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Sparkles, Zap, Wrench, GitBranch, Shield } from 'lucide-react';
+import { MoonStars, Zap, Code, GitBranch, Shield } from './PixelIcon';
 import type { ICard } from '../game/types';
 
 interface CardProps {
@@ -11,43 +11,48 @@ interface CardProps {
   isDragging?: boolean;
 }
 
-const CARD_COLORS: Record<string, { gradient: string; border: string; icon: string; shadow: string }> = {
+const CARD_COLORS: Record<string, { gradient: string; border: string; icon: string; shadow: string; iconBg: string }> = {
   context: {
     gradient: 'from-blue-500 to-blue-600',
     border: 'border-blue-400',
-    icon: 'text-blue-200',
+    icon: 'text-blue-900',
     shadow: 'hover:shadow-blue-500/50',
+    iconBg: 'bg-blue-100',
   },
   model: {
     gradient: 'from-purple-500 to-purple-600',
     border: 'border-purple-400',
-    icon: 'text-purple-200',
+    icon: 'text-purple-900',
     shadow: 'hover:shadow-purple-500/50',
+    iconBg: 'bg-purple-100',
   },
   tool: {
     gradient: 'from-teal-500 to-teal-600',
     border: 'border-teal-400',
-    icon: 'text-teal-200',
+    icon: 'text-teal-900',
     shadow: 'hover:shadow-teal-500/50',
+    iconBg: 'bg-teal-100',
   },
   framework: {
     gradient: 'from-orange-500 to-orange-600',
     border: 'border-orange-400',
-    icon: 'text-orange-200',
+    icon: 'text-orange-900',
     shadow: 'hover:shadow-orange-500/50',
+    iconBg: 'bg-orange-100',
   },
   guardrail: {
     gradient: 'from-red-500 to-red-600',
     border: 'border-red-400',
-    icon: 'text-red-200',
+    icon: 'text-red-900',
     shadow: 'hover:shadow-red-500/50',
+    iconBg: 'bg-red-100',
   },
 };
 
 const CARD_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
-  context: Sparkles,
+  context: MoonStars,
   model: Zap,
-  tool: Wrench,
+  tool: Code,
   framework: GitBranch,
   guardrail: Shield,
 };
@@ -77,7 +82,7 @@ export const Card: React.FC<CardProps> = ({
       onClick={onClick}
       animate={isDragging ? {} : { x: 0, y: 0 }}
       className={`
-        w-[150px] h-[200px] rounded-lg overflow-hidden
+        w-[160px] h-[220px] rounded-lg overflow-hidden
         ${isInHand ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
         shadow-lg ${!isDragging ? colors.shadow : ''}
         ${isDragging ? 'shadow-2xl' : ''}
@@ -94,13 +99,18 @@ export const Card: React.FC<CardProps> = ({
       <div className={`absolute inset-0 border-2 ${colors.border} rounded-lg`} />
 
       {/* Content */}
-      <div className="relative h-full p-3 flex flex-col">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <Icon className={`w-5 h-5 ${colors.icon}`} />
-          <div className="flex items-center gap-1 bg-black/30 px-2 py-0.5 rounded-full">
-            <Zap className="w-3 h-3 text-yellow-300" />
-            <span className="text-white text-xs font-bold">{card.energyCost}</span>
+      <div className="relative h-full p-4 flex flex-col">
+        {/* Header with Icon and Cost */}
+        <div className="flex items-center justify-between mb-3">
+          {/* Icon on Light Background Square */}
+          <div className={`w-12 h-12 ${colors.iconBg} rounded-md flex items-center justify-center`}>
+            <Icon className={`w-7 h-7 ${colors.icon}`} />
+          </div>
+
+          {/* Cost Badge on White Background */}
+          <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-md border-2 border-black shadow-[2px_2px_0px_0px_#000]">
+            <Zap className="w-3.5 h-3.5 text-yellow-400" />
+            <span className="text-black text-sm font-bold">{card.energyCost}</span>
           </div>
         </div>
 
@@ -117,24 +127,35 @@ export const Card: React.FC<CardProps> = ({
         </div>
 
         {/* Description */}
-        <p className="text-white/90 text-xs leading-tight mb-2 flex-1 overflow-hidden">
+        <p className="text-white/90 text-xs leading-tight mb-3 flex-1 overflow-hidden">
           {card.description}
         </p>
 
-        {/* Quick Stats */}
-        <div className="space-y-1">
-          {card.pros.length > 0 && (
-            <div className="text-xs">
-              <span className="text-green-200 font-semibold">+</span>
-              <span className="text-white/80 ml-1">{card.pros[0]}</span>
-            </div>
-          )}
-          {card.cons.length > 0 && (
-            <div className="text-xs">
-              <span className="text-red-200 font-semibold">-</span>
-              <span className="text-white/80 ml-1">{card.cons[0]}</span>
-            </div>
-          )}
+        {/* Quick Stats - Fixed Height Containers */}
+        <div className="space-y-1.5">
+          {/* Pro - Always same size */}
+          <div className="h-8 bg-black/20 rounded px-2 py-1 flex items-start">
+            {card.pros.length > 0 ? (
+              <>
+                <span className="text-green-300 font-bold text-xs mr-1">+</span>
+                <span className="text-white/90 text-xs leading-tight">{card.pros[0]}</span>
+              </>
+            ) : (
+              <span className="text-white/40 text-xs italic">No pros listed</span>
+            )}
+          </div>
+
+          {/* Con - Always same size */}
+          <div className="h-8 bg-black/20 rounded px-2 py-1 flex items-start">
+            {card.cons.length > 0 ? (
+              <>
+                <span className="text-red-300 font-bold text-xs mr-1">-</span>
+                <span className="text-white/90 text-xs leading-tight">{card.cons[0]}</span>
+              </>
+            ) : (
+              <span className="text-white/40 text-xs italic">No cons listed</span>
+            )}
+          </div>
         </div>
       </div>
 

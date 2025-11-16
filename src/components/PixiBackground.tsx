@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-import { Application, Graphics } from 'pixi.js';
 
 interface Particle {
   x: number;
@@ -7,147 +6,113 @@ interface Particle {
   vx: number;
   vy: number;
   size: number;
-  color: number;
+  color: string;
   alpha: number;
+  pulseOffset: number;
 }
 
 export const PixiBackground: React.FC = () => {
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationRef = useRef<number | null>(null);
+  const particlesRef = useRef<Particle[]>([]);
 
   useEffect(() => {
-    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    let app: Application | null = null;
-    let mounted = true;
-    let initialized = false;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    const init = async () => {
-      try {
-        // Create PixiJS application
-        app = new Application();
+    const resizeCanvas = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
 
-        await app.init({
-          width: window.innerWidth,
-          height: window.innerHeight,
-          backgroundColor: 0x1a1a2e,
-          backgroundAlpha: 0,
-          antialias: true,
-          resolution: window.devicePixelRatio || 1,
-        });
+    const colors = [
+      '#00d9ff', // Neon cyan
+      '#ff00ff', // Magenta
+      '#ffaa00', // Orange
+      '#ff1493', // Hot pink
+      '#00ff88', // Neon green
+    ];
 
-        // Mark as initialized after init completes
-        initialized = true;
+    const particleCount = 150;
+    particlesRef.current = [];
 
-        if (!mounted || !canvasRef.current) {
-          if (app && app.renderer) {
-            app.destroy(true);
-          }
-          return;
-        }
+    for (let i = 0; i < particleCount; i++) {
+      particlesRef.current.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        size: Math.random() * 4 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        alpha: Math.random() * 0.6 + 0.3,
+        pulseOffset: Math.random() * Math.PI * 2,
+      });
+    }
 
-        canvasRef.current.appendChild(app.canvas as HTMLCanvasElement);
+    const animate = () => {
+      if (!canvas || !ctx) return;
 
-        // Create particles
-        const particles: Particle[] = [];
-        const particleCount = 100;
+      ctx.fillStyle = 'rgba(26, 26, 46, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        const colors = [
-          0x667eea, // purple
-          0xf5576c, // pink
-          0x00bcd4, // teal
-          0xffa726, // orange
-          0x42a5f5, // blue
-        ];
+      particlesRef.current.forEach((particle) => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
 
-        for (let i = 0; i < particleCount; i++) {
-          particles.push({
-            x: Math.random() * app.screen.width,
-            y: Math.random() * app.screen.height,
-            vx: (Math.random() - 0.5) * 0.5,
-            vy: (Math.random() - 0.5) * 0.5,
-            size: Math.random() * 3 + 1,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            alpha: Math.random() * 0.5 + 0.2,
-          });
-        }
+        // Wrap around edges
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.y > canvas.height) particle.y = 0;
 
-        // Create graphics for particles
-        const particleGraphics = new Graphics();
-        app.stage.addChild(particleGraphics);
+        // Calculate pulsing alpha
+        const pulseAlpha = Math.sin(Date.now() * 0.002 + particle.pulseOffset) * 0.4 + 0.6;
+        const finalAlpha = particle.alpha * pulseAlpha;
 
-        // Animation loop
-        app.ticker.add(() => {
-          if (!mounted) return;
+        // Draw particle with glow effect
+        // Outer glow
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * 6, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color + Math.floor(finalAlpha * 0.2 * 255).toString(16).padStart(2, '0');
+        ctx.fill();
 
-          particleGraphics.clear();
+        // Middle glow
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * 3, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color + Math.floor(finalAlpha * 0.4 * 255).toString(16).padStart(2, '0');
+        ctx.fill();
 
-          particles.forEach((particle) => {
-            // Update position
-            particle.x += particle.vx;
-            particle.y += particle.vy;
+        // Core particle
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fillStyle = particle.color + Math.floor(finalAlpha * 255).toString(16).padStart(2, '0');
+        ctx.fill();
+      });
 
-            // Wrap around screen
-            if (particle.x < 0) particle.x = app!.screen.width;
-            if (particle.x > app!.screen.width) particle.x = 0;
-            if (particle.y < 0) particle.y = app!.screen.height;
-            if (particle.y > app!.screen.height) particle.y = 0;
-
-            // Pulse alpha
-            particle.alpha = Math.sin(Date.now() * 0.001 + particle.x) * 0.3 + 0.4;
-
-            // Draw particle
-            particleGraphics.circle(particle.x, particle.y, particle.size);
-            particleGraphics.fill({ color: particle.color, alpha: particle.alpha });
-
-            // Add glow effect
-            particleGraphics.circle(particle.x, particle.y, particle.size * 2);
-            particleGraphics.fill({ color: particle.color, alpha: particle.alpha * 0.3 });
-          });
-        });
-
-        // Handle window resize
-        const handleResize = () => {
-          if (app && app.renderer && mounted && initialized) {
-            app.renderer.resize(window.innerWidth, window.innerHeight);
-          }
-        };
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-          window.removeEventListener('resize', handleResize);
-        };
-      } catch (error) {
-        console.error('PixiJS initialization error:', error);
-        initialized = false;
-      }
+      animationRef.current = requestAnimationFrame(animate);
     };
 
-    init();
+    animate();
 
-    // Cleanup
     return () => {
-      mounted = false;
-      if (app) {
-        try {
-          // Only destroy if initialization completed
-          if (initialized && app.renderer) {
-            app.destroy(true, { children: true });
-          } else if (app.renderer) {
-            // If partially initialized, still try to destroy
-            app.destroy(true);
-          }
-        } catch (error) {
-          console.error('PixiJS cleanup error:', error);
-        } finally {
-          // Ensure reference is cleared
-          app = null;
-        }
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationRef.current !== null) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
       }
+      // Clear particles array
+      particlesRef.current = [];
     };
   }, []);
 
   return (
-    <div
+    <canvas
       ref={canvasRef}
       className="fixed inset-0 pointer-events-none"
       style={{ zIndex: 1 }}

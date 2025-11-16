@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Volume2, Music } from 'lucide-react';
+import { ArrowLeft, Volume2, Music } from '../components/PixelIcon';
 import { useGameStore } from '../store/gameStore';
 
 interface SettingsScreenProps {

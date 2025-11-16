@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
+import { Loader } from './PixelIcon';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -26,7 +26,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           ease: 'linear',
         }}
       >
-        <Loader2 className={`${sizeClasses[size]} text-purple-400`} />
+        <Loader className={`${sizeClasses[size]} text-purple-400`} />
       </motion.div>
       {message && (
         <motion.p

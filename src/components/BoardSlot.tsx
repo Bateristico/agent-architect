@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import type { ICard } from '../game/types';
 
@@ -7,7 +8,6 @@ interface BoardSlotProps {
   onRemove: () => void;
 }
 
-// Pixel art SVG icon components
 const PixelIcon: React.FC<{ type: string; size: number; color?: string }> = ({ type, size, color = 'currentColor' }) => {
   const iconPaths: Record<string, string> = {
     context: "M5 3H3v18h18V3H5zm14 2v14H5V5h14zm-2 2H7v2h10V7zM7 11h10v2H7v-2zm7 4H7v2h7v-2z",
@@ -19,141 +19,96 @@ const PixelIcon: React.FC<{ type: string; size: number; color?: string }> = ({ t
     message: "M20 2H2v20h2V4h16v12H6v2H4v2h2v-2h16V2h-2z"
   };
 
-  const iconPath = iconPaths[type] || iconPaths.context;
-
   return (
     <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={size} height={size} style={{ display: 'block' }}>
-      <path d={iconPath} fill={color} />
+      <path d={iconPaths[type] || iconPaths.context} fill={color} />
     </svg>
   );
 };
 
-// Get card type display name
 const getCardTypeName = (type: string): string => {
-  switch (type) {
-    case 'context': return 'CONTEXT';
-    case 'model': return 'MODEL';
-    case 'tools': return 'TOOL';
-    case 'framework': return 'FRAMEWORK';
-    case 'guardrails': return 'GUARDRAIL';
-    default: return type.toUpperCase();
-  }
-};
-
-// Get CSS variable name for card type
-const getCardColorVar = (type: string): string => {
-  const typeMap: Record<string, string> = {
-    'context': 'context',
-    'model': 'model',
-    'tools': 'tool',
-    'framework': 'framework',
-    'guardrails': 'guardrail'
+  const names: Record<string, string> = {
+    context: 'CONTEXT',
+    model: 'MODEL',
+    tools: 'TOOL',
+    framework: 'FRAMEWORK',
+    guardrails: 'GUARDRAIL'
   };
-  return typeMap[type] || type;
+  return names[type] || type.toUpperCase();
 };
 
-export const BoardSlot: React.FC<BoardSlotProps> = ({ type, card, onRemove }) => {
-  const colorVar = getCardColorVar(type);
+const getCardColorVar = (type: string): string => {
+  const map: Record<string, string> = {
+    context: 'context',
+    model: 'model',
+    tools: 'tool',
+    framework: 'framework',
+    guardrails: 'guardrail'
+  };
+  return map[type] || type;
+};
+
+export const BoardSlot = React.memo<BoardSlotProps>(({ type, card, onRemove }) => {
   const typeName = getCardTypeName(type);
+  const colorVar = getCardColorVar(type);
 
   return (
     <motion.div
       onClick={() => card && onRemove()}
       whileHover={card ? { scale: 1.05, rotate: 2 } : {}}
       whileTap={{ scale: 0.98 }}
-      className={`relative p-1 ${
-        card ? `slot-gradient-${colorVar}` : ''
-      }`}
       style={{
         width: '140px',
         height: '200px',
         background: card ? undefined : 'var(--card)',
-        border: `3px ${card ? 'solid' : 'dashed'} ${card ? `var(--${colorVar}-color)` : 'rgba(255, 255, 255, 0.3)'}`,
-        transition: 'all 200ms ease-out',
-        cursor: card ? 'pointer' : 'default'
+        border: card ? `3px solid var(--${colorVar}-color)` : '3px dashed var(--border)',
+        boxShadow: card ? `0 0 15px rgba(var(--${colorVar}-rgb), 0.4), var(--shadow-xs)` : 'var(--shadow-xs)',
+        cursor: card ? 'pointer' : 'default',
+        transition: 'all 150ms ease-out',
       }}
+      className={`relative p-1 ${card ? `slot-gradient-${colorVar}` : ''}`}
     >
       {card ? (
         <div
           className="w-full h-full flex flex-col relative overflow-hidden"
           style={{
             background: `color-mix(in srgb, var(--${colorVar}-dark) 80%, #000000 20%)`,
-            border: `2px solid rgba(0, 0, 0, 0.3)`
+            border: '2px solid rgba(0, 0, 0, 0.3)',
           }}
         >
-          {/* Header with message and cost */}
           <div className="flex items-start justify-between p-2 flex-shrink-0">
-            {/* Message icon - Top Left */}
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                console.log('Message icon clicked for card:', card.id);
-              }}
-              className="z-10 flex items-center gap-1"
+              onClick={(e) => e.stopPropagation()}
+              className="z-10"
               style={{
                 background: 'rgba(255, 255, 255, 0.9)',
                 border: '2px solid #000000',
-                cursor: 'pointer',
-                transition: 'all 100ms ease-out',
-                padding: '3px 6px',
-                boxShadow: '2px 2px 0px #000000'
-              }}
-            >
-              <PixelIcon type="message" size={12} color="#000000" />
-            </button>
-
-            {/* Energy cost - Top Right */}
-            <div
-              className="flex items-center gap-1 z-10"
-              style={{
-                background: 'rgba(255, 255, 255, 0.9)',
-                border: '2px solid #000000',
-                padding: '3px 6px',
-                fontSize: '12px',
-                fontFamily: 'var(--font-sans)',
-                fontWeight: 'bold',
+                padding: '3px 5px',
                 boxShadow: '2px 2px 0px #000000',
-                lineHeight: '1'
               }}
             >
-              <PixelIcon type="zap" size={12} color="#FFD700" />
-              <span style={{ lineHeight: '1', color: '#000000' }}>{card.energyCost}</span>
+              <PixelIcon type="message" size={11} color="#000000" />
+            </button>
+            <div
+              className="z-10"
+              style={{
+                background: 'rgba(255, 255, 255, 0.9)',
+                border: '2px solid #000000',
+                padding: '3px 5px',
+                boxShadow: '2px 2px 0px #000000',
+              }}
+            >
+              <PixelIcon type="zap" size={11} color="#FFD700" />
+              <span style={{ fontSize: '11px', color: '#000000', fontWeight: 'bold' }}>{card.energyCost}</span>
             </div>
           </div>
-
-          {/* Icon - Centered in card */}
-          <div
-            className="flex items-center justify-center flex-1"
-          >
-            <div
-              className="flex items-center justify-center"
-              style={{
-                width: '56px',
-                height: '56px',
-                background: 'rgba(255, 255, 255, 0.9)',
-                border: '2px solid #000000'
-              }}
-            >
+          <div className="flex items-center justify-center flex-1">
+            <div style={{ width: '56px', height: '56px', background: 'rgba(255, 255, 255, 0.9)', border: '2px solid #000000' }}>
               <PixelIcon type={type} size={40} color="#000000" />
             </div>
           </div>
-
-          {/* Banner at bottom with card name */}
-          <div
-            style={{
-              background: 'rgba(0, 0, 0, 0.5)',
-              padding: '8px 12px',
-              borderTop: '2px solid rgba(0, 0, 0, 0.7)'
-            }}
-          >
-            <div
-              className="text-xs font-bold text-center leading-tight"
-              style={{
-                fontFamily: 'var(--font-sans)',
-                color: '#ffffff',
-                textShadow: '1px 1px 2px rgba(0, 0, 0, 0.8)'
-              }}
-            >
+          <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '8px 12px', borderTop: '2px solid rgba(0, 0, 0, 0.7)' }}>
+            <div className="text-xs font-bold text-center" style={{ color: '#ffffff' }}>
               {card.name}
             </div>
           </div>
@@ -163,14 +118,13 @@ export const BoardSlot: React.FC<BoardSlotProps> = ({ type, card, onRemove }) =>
           <div style={{ opacity: 0.3 }}>
             <PixelIcon type={type} size={48} />
           </div>
-          <div
-            className="text-[10px] uppercase text-center"
-            style={{ fontFamily: 'var(--font-sans)', color: 'var(--muted-foreground)' }}
-          >
+          <div className="text-xs uppercase text-center" style={{ color: 'var(--muted-foreground)' }}>
             {typeName} SLOT
           </div>
         </div>
       )}
     </motion.div>
   );
-};
+});
+
+BoardSlot.displayName = 'BoardSlot';

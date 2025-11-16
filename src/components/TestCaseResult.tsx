@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CheckCircle, XCircle, DollarSign, Clock } from 'lucide-react';
+import { Check, Close, Coin, Clock } from './PixelIcon';
 import type { TestCaseResult as ITestCaseResult } from '../game/GameSimulator';
 
 interface TestCaseResultProps {
@@ -26,9 +26,9 @@ export const TestCaseResult: React.FC<TestCaseResultProps> = ({ result, index })
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
             {isSuccess ? (
-              <CheckCircle className="w-6 h-6 text-green-400" />
+              <Check className="w-6 h-6 text-green-400" />
             ) : (
-              <XCircle className="w-6 h-6 text-red-400" />
+              <Close className="w-6 h-6 text-red-400" />
             )}
             <span className={`font-bold ${isSuccess ? 'text-green-400' : 'text-red-400'}`}>
               {isSuccess ? 'PASSED' : 'FAILED'}
@@ -42,7 +42,7 @@ export const TestCaseResult: React.FC<TestCaseResultProps> = ({ result, index })
         {/* Metrics */}
         <div className="flex gap-3 text-sm">
           <div className="flex items-center gap-1 text-yellow-300">
-            <DollarSign className="w-4 h-4" />
+            <Coin className="w-4 h-4" />
             <span>{evaluation.cost.toFixed(1)}</span>
           </div>
           <div className="flex items-center gap-1 text-blue-300">

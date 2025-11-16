@@ -55,7 +55,6 @@ function App() {
   const handleExecutionComplete = (result: LevelResult) => {
     setLevelResult(result);
 
-    // Save progress to localStorage
     if (progress.currentLevel && result.stars >= 1) {
       completeLevel(progress.currentLevel, result.stars);
     }

@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { ArrowLeft, Github, Heart } from 'lucide-react';
+import { ArrowLeft, Github, Heart } from '../components/PixelIcon';
 
 interface AboutScreenProps {
   onBack: () => void;

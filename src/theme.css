@@ -33,11 +33,56 @@
   --card-guardrail-light: #00ff88; /* Neon green */
   --card-guardrail-dark: #00cc44;  /* Deep green */
 
+  /* Simplified Aliases for Component Use */
+  --context-color: var(--card-context-light);
+  --context-dark: var(--card-context-dark);
+  --model-color: var(--card-model-light);
+  --model-dark: var(--card-model-dark);
+  --tool-color: var(--card-tool-light);
+  --tool-dark: var(--card-tool-dark);
+  --framework-color: var(--card-framework-light);
+  --framework-dark: var(--card-framework-dark);
+  --guardrail-color: var(--card-guardrail-light);
+  --guardrail-dark: var(--card-guardrail-dark);
+
+  /* RGB Values for Type-Specific Glows */
+  --context-rgb: 0, 217, 255;
+  --model-rgb: 255, 0, 255;
+  --tool-rgb: 255, 170, 0;
+  --framework-rgb: 255, 20, 147;
+  --guardrail-rgb: 0, 255, 136;
+
   /* UI Elements */
   --text-primary: #ffffff;    /* Pure white for readability */
   --text-secondary: #d4a5f5;  /* Soft lavender */
   --border-color: #ffffff;    /* White borders (3-4px thickness) */
   --shadow-color: #000000;    /* Hard black shadows (no blur) */
+
+  /* Additional Aliases for Game Board Theme Compatibility */
+  --background: var(--bg-primary);
+  --foreground: var(--text-primary);
+  --card: var(--bg-secondary);
+  --card-foreground: var(--text-primary);
+  --popover: var(--bg-accent);
+  --popover-foreground: var(--text-primary);
+  --muted: var(--bg-accent);
+  --muted-foreground: var(--text-secondary);
+  --accent: var(--card-tool-light);
+  --accent-foreground: var(--bg-primary);
+  --border: var(--border-color);
+  --destructive: var(--effect-error);
+  --destructive-foreground: var(--text-primary);
+  --success-color: var(--effect-success);
+  --error-color: var(--effect-error);
+  --font-sans: var(--font-pixel);
+  --font-serif: var(--font-pixel-alt);
+  --shadow: var(--shadow-pixel);
+  --shadow-xs: 2px 2px 0px var(--shadow-color);
+  --shadow-sm: 3px 3px 0px var(--shadow-color);
+  --shadow-md: var(--shadow-pixel);
+  --shadow-lg: var(--shadow-pixel-hover);
+  --shadow-xl: 8px 8px 0px var(--shadow-color);
+  --shadow-2xl: 10px 10px 0px var(--shadow-color);
 
   /* Effect Colors */
   --effect-glow: #ff00ff;     /* Bright magenta glow */
@@ -216,4 +261,35 @@
 .text-small {
   font-size: var(--font-size-small);
   line-height: 1.4;
+}
+
+/* Enhanced Card Styling */
+.card-icon-glow {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+/* Type-specific gradient backgrounds for filled slots */
+.slot-gradient-context {
+  background: linear-gradient(135deg, var(--card-context-dark) 0%, var(--card-context-light) 100%);
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.3), 4px 4px 0px var(--shadow-color);
+}
+
+.slot-gradient-model {
+  background: linear-gradient(135deg, var(--card-model-dark) 0%, var(--card-model-light) 100%);
+  box-shadow: 0 0 20px rgba(255, 0, 255, 0.3), 4px 4px 0px var(--shadow-color);
+}
+
+.slot-gradient-tool {
+  background: linear-gradient(135deg, var(--card-tool-dark) 0%, var(--card-tool-light) 100%);
+  box-shadow: 0 0 20px rgba(255, 170, 0, 0.3), 4px 4px 0px var(--shadow-color);
+}
+
+.slot-gradient-framework {
+  background: linear-gradient(135deg, var(--card-framework-dark) 0%, var(--card-framework-light) 100%);
+  box-shadow: 0 0 20px rgba(255, 20, 147, 0.3), 4px 4px 0px var(--shadow-color);
+}
+
+.slot-gradient-guardrail {
+  background: linear-gradient(135deg, var(--card-guardrail-dark) 0%, var(--card-guardrail-light) 100%);
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3), 4px 4px 0px var(--shadow-color);
 }

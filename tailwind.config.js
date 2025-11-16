@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+// Unified Design System - Best of Both Worlds
+// Combines semantic spacing tokens, comprehensive shadow system, and enhanced visual effects
 export default {
   content: [
     "./index.html",
@@ -65,6 +67,14 @@ export default {
       },
 
       fontSize: {
+        'xs': '0.625rem',   // 10px
+        'sm': '0.75rem',    // 12px
+        'base': '0.875rem', // 14px
+        'lg': '1rem',       // 16px
+        'xl': '1.5rem',     // 24px
+        '2xl': '2rem',      // 32px
+        '3xl': '3rem',      // 48px
+        // Semantic aliases for better readability
         'logo': ['48px', { lineHeight: '1.2' }],
         'title': ['32px', { lineHeight: '1.3' }],
         'heading': ['24px', { lineHeight: '1.4' }],
@@ -74,9 +84,22 @@ export default {
         'small': ['10px', { lineHeight: '1.4' }],
       },
 
+      spacing: {
+        // Semantic spacing tokens for consistency
+        'xs': '0.25rem',  // 4px
+        'sm': '0.5rem',   // 8px
+        'md': '1rem',     // 16px
+        'lg': '1.5rem',   // 24px
+        'xl': '2rem',     // 32px
+        '2xl': '3rem',    // 48px
+        '3xl': '4rem',    // 64px
+        '4xl': '6rem',    // 96px
+      },
+
       borderWidth: {
-        'pixel': '3px',
-        'pixel-thick': '4px',
+        // Enhanced pixel borders (stronger than default)
+        'pixel': '4px',       // Standard pixel border (upgraded from 3px)
+        'pixel-thick': '5px', // Thick pixel border (upgraded from 4px)
       },
 
       borderRadius: {
@@ -85,18 +108,22 @@ export default {
       },
 
       boxShadow: {
-        'pixel': '4px 4px 0px 0px #000000',
-        'pixel-hover': '6px 6px 0px 0px #000000',
-        'pixel-glow': '0 0 20px currentColor',
+        // Comprehensive shadow system combining both approaches
+        'pixel': '5px 5px 0px 0px #000000',       // Enhanced standard (was 4px)
+        'pixel-hover': '7px 7px 0px 0px #000000', // Enhanced hover (was 6px)
+        'pixel-large': '8px 8px 0px 0px #000000', // Large shadow for emphasis
+        'pixel-small': '2px 2px 0px 0px #000000', // Small shadow for subtle depth
+        'pixel-glow': '0 0 20px currentColor',     // Glow effect
         'none': 'none',
       },
 
       dropShadow: {
-        'pixel': '2px 2px 0px #000000',
-        'pixel-thick': '4px 4px 0px #000000',
+        'pixel': '2px 2px 0px #000000',       // Standard drop shadow
+        'pixel-thick': '4px 4px 0px #000000', // Thick drop shadow
       },
 
       animation: {
+        // Core animations - kept minimal in config, most are in animations.css
         'hover-float': 'hoverFloat 100ms ease-out forwards',
         'tap-press': 'tapPress 80ms ease-in forwards',
         'card-place': 'cardPlace 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
@@ -104,7 +131,7 @@ export default {
         'score-bounce': 'scoreBounce 600ms cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
         'glow-pulse': 'glowPulse 2s ease-in-out infinite',
         'shake': 'shake 400ms ease-in-out',
-        'scanline': 'scanline 8s linear infinite',
+        'scanline': 'scanline 6s linear infinite',
         'particle-float': 'particleFloat 3s ease-in-out infinite',
       },
 
@@ -151,15 +178,22 @@ export default {
       },
 
       transitionDuration: {
-        'hover': '100ms',
-        'tap': '80ms',
-        'placement': '300ms',
-        'reveal': '200ms',
+        // Comprehensive duration system with both semantic and base values
+        'instant': '0ms',      // Instant changes
+        'fast': '100ms',       // Fast interactions
+        'normal': '200ms',     // Normal transitions
+        'slow': '300ms',       // Slow, deliberate transitions
+        'slower': '600ms',     // Very slow transitions
+        // Semantic aliases for specific use cases
+        'hover': '100ms',      // Hover state transitions
+        'tap': '80ms',         // Tap/click feedback
+        'placement': '300ms',  // Card placement
+        'reveal': '200ms',     // Reveal animations
       },
 
       transitionTimingFunction: {
-        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
-        'pop': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'bounce': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Bouncy easing
+        'pop': 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',    // Pop effect (same as bounce)
       },
     },
   },

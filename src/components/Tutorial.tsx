@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ArrowRight, Sparkles, Zap, Target } from 'lucide-react';
+import { Close, ArrowRight, MoonStars, Zap, BullseyeArrow } from './PixelIcon';
 import { useState } from 'react';
 
 interface TutorialProps {
@@ -11,7 +11,7 @@ const tutorialSteps = [
   {
     title: 'Welcome to AgentCraft!',
     description: 'Learn how to design AI agents by combining the right components. Each level presents a challenge that teaches you key concepts.',
-    icon: Sparkles,
+    icon: MoonStars,
     color: 'text-purple-400',
   },
   {
@@ -23,7 +23,7 @@ const tutorialSteps = [
   {
     title: 'Energy Budget',
     description: 'Each card costs energy. You must stay within your budget while meeting the level requirements. Choose wisely!',
-    icon: Target,
+    icon: BullseyeArrow,
     color: 'text-green-400',
   },
   {
@@ -67,7 +67,7 @@ export const Tutorial: React.FC<TutorialProps> = ({ onComplete, onSkip }) => {
           onClick={onSkip}
           className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors"
         >
-          <X className="w-6 h-6" />
+          <Close className="w-6 h-6" />
         </button>
 
         {/* Content */}

@@ -1,8 +1,8 @@
 import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
-import { Star, RotateCcw, Home, ArrowRight, Target, Zap, Shield, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { LevelResult } from '../game/GameSimulator';
 import type { ILevel } from '../game/types';
+import { PixiBackground } from '../components/PixiBackground';
 
 interface ResultsScreenProps {
   result: LevelResult;
@@ -15,243 +15,586 @@ interface ResultsScreenProps {
 
 export const ResultsScreen: React.FC<ResultsScreenProps> = ({
   result,
-  level,
+  // level is not used in the current implementation
   onRetry,
   onNextLevel,
   onMainMenu,
   hasNextLevel,
 }) => {
   const { stars, totalScore, accuracyScore, efficiencyScore, bestPracticesScore, robustnessScore, feedback } = result;
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Trigger confetti on mount
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowConfetti(true);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Calculate performance breakdown
+  const performanceCards = [
+    { label: 'ACCURACY', emoji: '🎯', score: accuracyScore, maxScore: 30, color: '#00d9ff', stars: accuracyScore >= 25 ? 3 : accuracyScore >= 20 ? 2 : 1 },
+    { label: 'EFFICIENCY', emoji: '⚡', score: efficiencyScore, maxScore: 20, color: '#ffaa00', stars: efficiencyScore >= 18 ? 3 : efficiencyScore >= 15 ? 2 : 1 },
+    { label: 'BEST PRACTICES', emoji: '🛡️', score: bestPracticesScore, maxScore: 30, color: '#ff00ff', stars: bestPracticesScore >= 25 ? 3 : bestPracticesScore >= 20 ? 2 : 1 },
+    { label: 'ROBUSTNESS', emoji: '📈', score: robustnessScore, maxScore: 20, color: '#00ff88', stars: robustnessScore >= 18 ? 3 : robustnessScore >= 15 ? 2 : 1 },
+  ];
+
+  // Calculate combo bonuses from feedback
+  const comboBonuses = feedback.slice(0, 3).map((item, index) => ({
+    text: item,
+    bonus: index === 0 ? 25 : index === 1 ? 30 : 15,
+    emoji: index === 0 ? '⚡' : index === 1 ? '🔗' : '🛡️',
+  }));
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ type: 'spring', duration: 0.6 }}
-        className="mb-8"
-      >
-        <h1 className="text-4xl font-bold text-white mb-4 text-center">
-          Level Complete!
-        </h1>
+    <div className="min-h-screen flex flex-col px-4 py-8 relative bg-[#2d1b3d]">
+      {/* PixiJS animated particle background */}
+      <PixiBackground />
 
-        {/* Stars */}
-        <div className="flex justify-center gap-2 mb-4">
-          {[1, 2, 3].map((star) => (
-            <motion.div
-              key={star}
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 + star * 0.1, type: 'spring' }}
-            >
-              <Star
-                className={`w-16 h-16 ${
-                  star <= stars ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'
-                }`}
-              />
-            </motion.div>
-          ))}
-        </div>
+      {/* Pixel grid background pattern */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
+          backgroundSize: '20px 20px',
+          zIndex: 0
+        }}
+      />
 
-        <div className="text-center">
-          <CountUpNumber value={totalScore} duration={1000} delay={600} className="text-6xl font-bold text-white mb-2" />
-          <div className="text-white/60 text-lg">out of 100 points</div>
-        </div>
-      </motion.div>
+      {/* Confetti Burst */}
+      {showConfetti && <ConfettiBurst />}
 
-      {/* Score Breakdown */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="max-w-3xl mx-auto w-full mb-8"
-      >
-        <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-lg p-6">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Score Breakdown</h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            {/* Accuracy */}
-            <ScoreCard
-              icon={<Target className="w-6 h-6" />}
-              label="Accuracy"
-              score={accuracyScore}
-              maxScore={30}
-              color="text-green-400"
-              delay={0.5}
-            />
-
-            {/* Efficiency */}
-            <ScoreCard
-              icon={<Zap className="w-6 h-6" />}
-              label="Efficiency"
-              score={efficiencyScore}
-              maxScore={20}
-              color="text-blue-400"
-              delay={0.6}
-            />
-
-            {/* Best Practices */}
-            <ScoreCard
-              icon={<Shield className="w-6 h-6" />}
-              label="Best Practices"
-              score={bestPracticesScore}
-              maxScore={30}
-              color="text-purple-400"
-              delay={0.7}
-            />
-
-            {/* Robustness */}
-            <ScoreCard
-              icon={<TrendingUp className="w-6 h-6" />}
-              label="Robustness"
-              score={robustnessScore}
-              maxScore={20}
-              color="text-orange-400"
-              delay={0.8}
-            />
+      {/* Content wrapper with z-index to appear above background */}
+      <div className="relative z-10 flex flex-col">
+        {/* Header */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
+          className="flex items-center justify-between mb-8"
+        >
+          <div className="flex-1" />
+          <h1
+            className="text-2xl md:text-3xl font-bold uppercase text-center"
+            style={{
+              color: '#00ff88',
+              textShadow: '2px 2px 0px #000000, 0 0 15px #00ff88, 0 0 30px #00ff88',
+              fontFamily: "'Press Start 2P', monospace",
+              animation: 'title-celebration 2s ease-in-out infinite alternate'
+            }}
+          >
+            RESULTS
+          </h1>
+          <div
+            className="flex-1 flex justify-end text-sm uppercase"
+            style={{
+              color: '#00ff88',
+              fontFamily: "'Press Start 2P', monospace",
+              animation: 'success-pulse 1s ease-in-out infinite'
+            }}
+          >
+            <span className="inline-block">🎉</span>
           </div>
+        </motion.div>
 
-          {/* Feedback */}
-          {feedback.length > 0 && (
-            <div className="mt-6 pt-6 border-t border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-yellow-400" />
-                {totalScore < 100 ? 'Areas for Improvement' : 'What You Did Right'}
-              </h3>
-              <div className="space-y-3">
-                {feedback.map((item, index) => {
-                  const isPositive = item.toLowerCase().includes('good') ||
-                                   item.toLowerCase().includes('excellent') ||
-                                   item.toLowerCase().includes('perfect');
+        {/* Level Complete Banner */}
+        <motion.div
+          initial={{ opacity: 0, y: -50, scale: 0.5 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+          className="text-center mb-8"
+        >
+          <h2
+            className="text-xl md:text-2xl font-bold uppercase"
+            style={{
+              color: '#ffaa00',
+              textShadow: '2px 2px 0px #000000, 0 0 10px #ffaa00',
+              fontFamily: "'Press Start 2P', monospace"
+            }}
+          >
+            ⭐ LEVEL COMPLETE! ⭐
+          </h2>
+        </motion.div>
 
-                  return (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.9 + index * 0.05 }}
-                      className={`flex items-start gap-3 p-3 rounded-lg ${
-                        isPositive ? 'bg-green-500/10 border border-green-500/20' : 'bg-yellow-500/10 border border-yellow-500/20'
-                      }`}
-                    >
-                      {isPositive ? (
-                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                      ) : (
-                        <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-                      )}
-                      <span className="text-white/90 text-sm leading-relaxed">{item}</span>
-                    </motion.div>
-                  );
-                })}
+        {/* Score Panel */}
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+          className="max-w-4xl mx-auto w-full mb-8"
+        >
+          <div
+            className="bg-[#2d1b3d]/90 backdrop-blur-sm p-6"
+            style={{
+              border: '4px solid #00ff88',
+              boxShadow: '4px 4px 0px #000000'
+            }}
+          >
+            <div className="mb-4">
+              <CountUpNumber
+                value={totalScore}
+                duration={2000}
+                delay={600}
+                className="text-3xl md:text-4xl font-bold text-center uppercase"
+                style={{
+                  color: '#ffaa00',
+                  textShadow: '2px 2px 0px #000000, 0 0 15px #ffaa00',
+                  fontFamily: "'Press Start 2P', monospace"
+                }}
+                prefix="FINAL SCORE: "
+                suffix=" / 100"
+              />
+            </div>
+
+            {/* Progress Bar */}
+            <div
+              className="relative h-10 overflow-hidden"
+              style={{
+                background: '#1a0f24',
+                border: '4px solid #ffffff',
+                boxShadow: 'inset 4px 4px 0px #000000'
+              }}
+            >
+              <motion.div
+                className="h-full relative"
+                initial={{ width: 0 }}
+                animate={{ width: `${totalScore}%` }}
+                transition={{ duration: 2, ease: "easeOut", delay: 1 }}
+                style={{
+                  background: 'linear-gradient(90deg, #00ff88 0%, #ffaa00 50%, #00ff88 100%)',
+                  boxShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
+                }}
+              />
+              <div
+                className="absolute inset-0 flex items-center justify-center text-base font-bold uppercase"
+                style={{
+                  color: '#ffffff',
+                  textShadow: '2px 2px 0px #000000',
+                  fontFamily: "'Press Start 2P', monospace",
+                  zIndex: 10
+                }}
+              >
+                {Math.round(totalScore)}%
               </div>
             </div>
-          )}
-        </div>
-      </motion.div>
+          </div>
+        </motion.div>
 
-      {/* Learning Point */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2 }}
-        className="max-w-3xl mx-auto w-full mb-8"
-      >
-        <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400/50 rounded-lg p-6">
-          <h3 className="text-xl font-bold text-purple-200 mb-3">💡 Key Learning</h3>
-          <p className="text-white/90 text-lg">
-            {getLearningPoint(level, stars, totalScore)}
-          </p>
-        </div>
-      </motion.div>
-
-      {/* Action Buttons */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.4 }}
-        className="flex flex-wrap justify-center gap-4"
-      >
-        <button
-          onClick={onRetry}
-          className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+        {/* Performance Breakdown */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="max-w-6xl mx-auto w-full mb-8"
         >
-          <RotateCcw className="w-5 h-5" />
-          <span>Retry Level</span>
-        </button>
-
-        {hasNextLevel && stars >= 1 && (
-          <button
-            onClick={onNextLevel}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white rounded-lg font-bold transition-colors"
+          <div
+            className="text-center text-sm mb-6 uppercase"
+            style={{
+              color: '#d4a5f5',
+              fontFamily: "'Silkscreen', monospace"
+            }}
           >
-            <span>Next Level</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
+            PERFORMANCE BREAKDOWN
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {performanceCards.map((card, index) => (
+              <PerformanceCard
+                key={card.label}
+                {...card}
+                delay={0.5 + index * 0.2}
+              />
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Combo Bonuses */}
+        {comboBonuses.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 1.2, ease: "easeOut", delay: 1.5 }}
+            className="max-w-4xl mx-auto w-full mb-8"
+          >
+            <div
+              className="bg-[#2d1b3d]/90 backdrop-blur-sm p-6"
+              style={{
+                border: '4px solid #00ff88',
+                boxShadow: '4px 4px 0px #000000'
+              }}
+            >
+              <div
+                className="text-center text-sm mb-4 uppercase"
+                style={{
+                  color: '#00ff88',
+                  fontFamily: "'Silkscreen', monospace"
+                }}
+              >
+                COMBO BONUSES
+              </div>
+              <div className="space-y-3">
+                {comboBonuses.map((combo, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 1.8 + index * 0.3, duration: 0.8, ease: "easeOut" }}
+                    className="flex items-center justify-between p-3"
+                    style={{
+                      background: 'rgba(74, 40, 89, 0.6)',
+                      border: '2px solid #ffffff'
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="text-xl"
+                        style={{ animation: 'icon-dance 2s ease-in-out infinite' }}
+                      >
+                        {combo.emoji}
+                      </span>
+                      <span
+                        className="text-xs"
+                        style={{
+                          color: '#d4a5f5',
+                          fontFamily: "'Silkscreen', monospace"
+                        }}
+                      >
+                        {combo.text}
+                      </span>
+                    </div>
+                    <div
+                      className="px-3 py-1 text-xs font-bold uppercase"
+                      style={{
+                        background: '#00ff88',
+                        color: '#2d1b3d',
+                        border: '2px solid #ffffff',
+                        boxShadow: '2px 2px 0px #000000',
+                        fontFamily: "'Press Start 2P', monospace",
+                        animation: 'bonus-glow 2s ease-in-out infinite'
+                      }}
+                    >
+                      +{combo.bonus}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
         )}
 
-        <button
-          onClick={onMainMenu}
-          className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+        {/* Rewards Earned */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.5, ease: "easeOut", delay: 2.2 }}
+          className="max-w-4xl mx-auto w-full mb-8"
         >
-          <Home className="w-5 h-5" />
-          <span>Main Menu</span>
-        </button>
-      </motion.div>
+          <div
+            className="bg-[#2d1b3d]/90 backdrop-blur-sm p-6"
+            style={{
+              border: '4px solid #ffaa00',
+              boxShadow: '4px 4px 0px #000000'
+            }}
+          >
+            <div
+              className="text-center text-sm mb-6 uppercase"
+              style={{
+                color: '#ffaa00',
+                fontFamily: "'Silkscreen', monospace"
+              }}
+            >
+              REWARDS EARNED
+            </div>
+            <div className="flex flex-wrap justify-center gap-6">
+              <RewardBadge emoji="🏆" label={`${stars} STARS`} delay={0.2} />
+              <RewardBadge emoji="💰" label={`+${totalScore} CHIPS`} delay={0.5} />
+              <RewardBadge emoji="🎯" label="PROGRESS" delay={0.8} />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Action Buttons */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.8 }}
+          className="flex flex-wrap justify-center gap-4"
+        >
+          {hasNextLevel && stars >= 1 && (
+            <motion.button
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3.0, duration: 0.8, ease: "easeOut" }}
+              onClick={onNextLevel}
+              whileHover={{ scale: 1.08, rotate: 1, transition: { duration: 0.15, ease: "easeOut" } }}
+              whileTap={{ scale: 0.95, transition: { duration: 0.08, ease: "easeIn" } }}
+              className="px-6 py-4 text-xs font-bold uppercase"
+              style={{
+                fontFamily: "'Press Start 2P', monospace",
+                background: '#00ff88',
+                color: '#2d1b3d',
+                border: '4px solid #ffffff',
+                boxShadow: '4px 4px 0px #000000',
+                transition: 'all 150ms ease-out'
+              }}
+            >
+              NEXT LEVEL
+            </motion.button>
+          )}
+
+          <motion.button
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3.2, duration: 0.8, ease: "easeOut" }}
+            onClick={onRetry}
+            whileHover={{ scale: 1.08, rotate: 1, transition: { duration: 0.15, ease: "easeOut" } }}
+            whileTap={{ scale: 0.95, transition: { duration: 0.08, ease: "easeIn" } }}
+            className="px-6 py-4 text-xs font-bold uppercase"
+            style={{
+              fontFamily: "'Press Start 2P', monospace",
+              background: '#ffaa00',
+              color: '#2d1b3d',
+              border: '4px solid #ffffff',
+              boxShadow: '4px 4px 0px #000000',
+              transition: 'all 150ms ease-out'
+            }}
+          >
+            RETRY LEVEL
+          </motion.button>
+
+          <motion.button
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 3.4, duration: 0.8, ease: "easeOut" }}
+            onClick={onMainMenu}
+            whileHover={{ scale: 1.08, rotate: 1, transition: { duration: 0.15, ease: "easeOut" } }}
+            whileTap={{ scale: 0.95, transition: { duration: 0.08, ease: "easeIn" } }}
+            className="px-6 py-4 text-xs font-bold uppercase"
+            style={{
+              fontFamily: "'Press Start 2P', monospace",
+              background: '#ffffff',
+              color: '#2d1b3d',
+              border: '4px solid #ffffff',
+              boxShadow: '4px 4px 0px #000000',
+              transition: 'all 150ms ease-out'
+            }}
+          >
+            MAIN MENU
+          </motion.button>
+        </motion.div>
+      </div>
+
+      {/* Add animations */}
+      <style>{`
+        @keyframes title-celebration {
+          from {
+            text-shadow: 2px 2px 0px #000000, 0 0 15px #00ff88, 0 0 30px #00ff88;
+            transform: scale(1);
+          }
+          to {
+            text-shadow: 2px 2px 0px #000000, 0 0 25px #00ff88, 0 0 50px #00ff88;
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes success-pulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        @keyframes card-entrance {
+          0% { opacity: 0; transform: translateY(50px) scale(0.8); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes star-twinkle {
+          0% { opacity: 0; transform: scale(0) rotate(180deg); }
+          50% { opacity: 1; transform: scale(1.3) rotate(0deg); }
+          100% { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes icon-dance {
+          0%, 100% { transform: translateY(0) rotate(0deg); }
+          25% { transform: translateY(-3px) rotate(5deg); }
+          50% { transform: translateY(0) rotate(0deg); }
+          75% { transform: translateY(-3px) rotate(-5deg); }
+        }
+
+        @keyframes bonus-glow {
+          0%, 100% {
+            box-shadow: 2px 2px 0px #000000;
+            transform: scale(1);
+          }
+          50% {
+            box-shadow: 2px 2px 0px #000000, 0 0 15px #00ff88;
+            transform: scale(1.05);
+          }
+        }
+
+        @keyframes reward-bounce {
+          0% { opacity: 0; transform: translateY(30px) scale(0.5); }
+          60% { opacity: 1; transform: translateY(-10px) scale(1.1); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-100vh) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
-// Score Card Component
-interface ScoreCardProps {
-  icon: React.ReactNode;
+// Performance Card Component
+interface PerformanceCardProps {
   label: string;
+  emoji: string;
   score: number;
   maxScore: number;
   color: string;
+  stars: number;
   delay: number;
 }
 
-const ScoreCard: React.FC<ScoreCardProps> = ({ icon, label, score, maxScore, color, delay }) => {
-  const percentage = (score / maxScore) * 100;
-
+const PerformanceCard: React.FC<PerformanceCardProps> = ({
+  label,
+  emoji,
+  score,
+  // maxScore is not used in the current implementation
+  color,
+  stars,
+  delay,
+}) => {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay }}
-      className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors duration-300"
+      initial={{ opacity: 0, y: 50, scale: 0.8 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut", delay }}
+      className="bg-[#2d1b3d]/90 backdrop-blur-sm p-5"
+      style={{
+        border: `4px solid ${color}`,
+        boxShadow: '4px 4px 0px #000000',
+        animation: `card-entrance 0.8s ease-out forwards`
+      }}
     >
-      <div className="flex items-center gap-3 mb-3">
-        <motion.div
-          initial={{ rotate: -180, opacity: 0 }}
-          animate={{ rotate: 0, opacity: 1 }}
-          transition={{ delay: delay + 0.1, type: 'spring' }}
-          className={color}
-        >
-          {icon}
-        </motion.div>
-        <div className="flex-1">
-          <div className="text-white font-semibold">{label}</div>
-          <div className="text-white/60 text-sm flex items-center gap-1">
-            <CountUpNumber value={score} duration={800} delay={delay * 1000 + 200} className="inline" />
-            <span>/</span>
-            <span>{maxScore} pts</span>
-          </div>
-        </div>
-        <div className={`text-2xl font-bold ${color}`}>
-          {Math.round(percentage)}%
-        </div>
+      <div
+        className="text-sm font-bold text-center mb-3 uppercase"
+        style={{
+          color: color,
+          fontFamily: "'Press Start 2P', monospace"
+        }}
+      >
+        {label}
       </div>
-      <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-        <motion.div
-          className={`h-full ${color.replace('text-', 'bg-')} rounded-full`}
-          initial={{ width: 0 }}
-          animate={{ width: `${percentage}%` }}
-          transition={{ delay: delay + 0.3, duration: 0.8, ease: 'easeOut' }}
-        />
+      <div className="text-center text-3xl mb-3">
+        {emoji}
+      </div>
+      <div
+        className="text-center text-lg font-bold mb-3"
+        style={{
+          color: '#ffffff',
+          fontFamily: "'Press Start 2P', monospace"
+        }}
+      >
+        +{score}
+      </div>
+      <div className="flex justify-center gap-1">
+        {[1, 2, 3].map((starNum) => (
+          <motion.span
+            key={starNum}
+            initial={{ opacity: 0, scale: 0, rotate: 180 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{
+              delay: delay + 0.2 + starNum * 0.2,
+              duration: 0.6,
+              ease: "easeOut"
+            }}
+            className="text-base"
+            style={{
+              color: starNum <= stars ? '#ffaa00' : '#666666',
+              textShadow: starNum <= stars ? '0 0 8px #ffaa00' : 'none'
+            }}
+          >
+            ⭐
+          </motion.span>
+        ))}
       </div>
     </motion.div>
+  );
+};
+
+// Reward Badge Component
+interface RewardBadgeProps {
+  emoji: string;
+  label: string;
+  delay: number;
+}
+
+const RewardBadge: React.FC<RewardBadgeProps> = ({ emoji, label, delay }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30, scale: 0.5 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{
+        delay: delay,
+        duration: 0.8,
+        ease: "easeOut"
+      }}
+      className="inline-block p-4"
+      style={{
+        background: 'rgba(74, 40, 89, 0.8)',
+        border: '3px solid #ffffff',
+        boxShadow: '3px 3px 0px #000000',
+        animation: 'reward-bounce 0.8s ease-out forwards'
+      }}
+    >
+      <div className="text-center text-2xl mb-2">{emoji}</div>
+      <div
+        className="text-xs font-bold uppercase text-center"
+        style={{
+          color: '#ffffff',
+          fontFamily: "'Press Start 2P', monospace"
+        }}
+      >
+        {label}
+      </div>
+    </motion.div>
+  );
+};
+
+// Confetti Burst Component
+const ConfettiBurst: React.FC = () => {
+  const colors = ['#00d9ff', '#ff00ff', '#ffaa00', '#ff1493', '#00ff88'];
+  const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    delay: Math.random() * 2,
+    duration: Math.random() * 2 + 2,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none" style={{ zIndex: 100 }}>
+      {confettiPieces.map((piece) => (
+        <div
+          key={piece.id}
+          className="absolute w-2 h-2"
+          style={{
+            left: `${piece.left}%`,
+            backgroundColor: piece.color,
+            animation: `confetti-fall ${piece.duration}s ease-out forwards`,
+            animationDelay: `${piece.delay}s`,
+          }}
+        />
+      ))}
+    </div>
   );
 };
 
@@ -261,9 +604,20 @@ interface CountUpNumberProps {
   duration?: number;
   delay?: number;
   className?: string;
+  style?: React.CSSProperties;
+  prefix?: string;
+  suffix?: string;
 }
 
-const CountUpNumber: React.FC<CountUpNumberProps> = ({ value, duration = 1000, delay = 0, className = '' }) => {
+const CountUpNumber: React.FC<CountUpNumberProps> = ({
+  value,
+  duration = 1000,
+  delay = 0,
+  className = '',
+  style = {},
+  prefix = '',
+  suffix = '',
+}) => {
   const count = useMotionValue(0);
   const rounded = useTransform(count, (latest) => Math.round(latest));
   const [displayValue, setDisplayValue] = useState(0);
@@ -289,22 +643,9 @@ const CountUpNumber: React.FC<CountUpNumberProps> = ({ value, duration = 1000, d
     return unsubscribe;
   }, [rounded]);
 
-  return <div className={className}>{displayValue}</div>;
+  return (
+    <div className={className} style={style}>
+      {prefix}{displayValue}{suffix}
+    </div>
+  );
 };
-
-// Get learning point based on level and performance
-function getLearningPoint(level: ILevel, stars: number, totalScore: number): string {
-  // Default learning points based on level
-  const defaultLearnings: Record<number, string> = {
-    1: 'Context and model selection are the foundation of any AI agent. Even basic setup can handle simple queries effectively.',
-  };
-
-  // Performance-based learning
-  if (stars === 3 && totalScore >= 90) {
-    return defaultLearnings[level.id] || 'Excellent work! You\'ve mastered the optimal configuration for this scenario.';
-  } else if (stars === 2) {
-    return defaultLearnings[level.id] || 'Good job! Consider adding tools or guardrails to improve robustness and safety.';
-  } else {
-    return defaultLearnings[level.id] || 'Remember: matching your agent components to the use case complexity is key to success.';
-  }
-}
