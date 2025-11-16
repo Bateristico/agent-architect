@@ -16,52 +16,57 @@ This file provides guidance to Claude Code (claude.ai/code) when working with th
 
 ## MANDATORY WORKFLOW FOR EVERY TASK
 
-**CRITICAL:** Before making ANY changes to the codebase, you MUST follow this workflow for EVERY task, no matter how small:
+**CRITICAL:** You MUST follow this 6-step workflow for **EVERY SINGLE TASK WITHOUT EXCEPTION**, regardless of size, complexity, or type. This applies to simple bug fixes, typo corrections, configuration changes, refactoring, feature additions, and everything in between.
 
 ### 1. ANALYZE - Understand the request and current state
-- Read relevant files to understand the current implementation
-- Identify what needs to change and potential impacts
-- Consider dependencies, side effects, and edge cases
-- **IMPORTANT:** Determine if this is a UI/UX task (modifying components, screens, styles, user-facing features)
+- **ALWAYS REQUIRED:** Read relevant files to understand the current implementation
+- **ALWAYS REQUIRED:** Identify what needs to change and potential impacts
+- **ALWAYS REQUIRED:** Consider dependencies, side effects, and edge cases
+- **ALWAYS REQUIRED:** Determine if this is a UI/UX task (modifying components, screens, styles, user-facing features)
 
 ### 2. PLAN - Create a comprehensive plan
-- Break down the task into specific, actionable steps
-- Identify all files that need to be modified
-- Consider the order of operations and dependencies
-- **IF UI/UX TASK:** Include design-review steps in the plan (see UI/UX Workflow section below)
+- **ALWAYS REQUIRED:** Break down the task into specific, actionable steps
+- **ALWAYS REQUIRED:** Identify all files that need to be modified
+- **ALWAYS REQUIRED:** Consider the order of operations and dependencies
+- **ADDITIONAL FOR UI/UX TASKS:** Include design-review steps in the plan (see UI/UX Workflow section below)
 
 ### 3. DESCRIBE - Clearly communicate the plan to the user
-- Explain what you're going to do in clear, concise language
-- Highlight any risks, trade-offs, or decisions that need user input
-- **IF UI/UX TASK:** Explicitly state that you will run design-review agent first
-- Wait for user confirmation if the changes are significant or risky
+- **ALWAYS REQUIRED:** Explain what you're going to do in clear, concise language
+- **ALWAYS REQUIRED:** Highlight any risks, trade-offs, or decisions that need user input
+- **ADDITIONAL FOR UI/UX TASKS:** Explicitly state that you will run design-review agent first
+- **ALWAYS REQUIRED:** Wait for user confirmation if the changes are significant or risky
 
 ### 4. CREATE TODO LIST - Use the TodoWrite tool
-- Create a detailed TODO list with all steps identified in the plan
-- All tasks should start as `pending`
-- **IF UI/UX TASK:** First TODO must be "Run design-review agent on current implementation"
-- Present the TODO list clearly to the user
+- **ALWAYS REQUIRED:** Create a detailed TODO list with all steps identified in the plan
+- **ALWAYS REQUIRED:** All tasks should start as `pending`
+- **ADDITIONAL FOR UI/UX TASKS:** First TODO must be "Run design-review agent on current implementation"
+- **ALWAYS REQUIRED:** Present the TODO list clearly to the user
 
 ### 5. WAIT FOR APPROVAL - Get explicit human confirmation
-- **MANDATORY:** STOP and wait for user approval before executing
-- Do NOT proceed to implementation without explicit user confirmation
-- User must review the plan and TODO list before any changes are made
+- **ALWAYS REQUIRED - STOP HERE:** Do NOT proceed to implementation without explicit user confirmation
+- **ALWAYS REQUIRED:** User must review the plan and TODO list before any changes are made
+- **ALWAYS REQUIRED:** Wait for clear approval (e.g., "proceed", "go ahead", "looks good", etc.)
 
 ### 6. EXECUTE - Implement the changes (only after approval)
-- **IF UI/UX TASK:** Start by running design-review agent BEFORE making any changes
-- Follow the plan and TODO list systematically
-- Mark tasks as `in_progress` when starting, `completed` immediately after finishing
-- Update the TODO list if new tasks are discovered during implementation
-- **IF UI/UX TASK:** Run design-review agent AGAIN after implementation to verify fixes
+- **ADDITIONAL FOR UI/UX TASKS:** Start by running design-review agent BEFORE making any changes
+- **ALWAYS REQUIRED:** Follow the plan and TODO list systematically
+- **ALWAYS REQUIRED:** Mark tasks as `in_progress` when starting, `completed` immediately after finishing
+- **ALWAYS REQUIRED:** Update the TODO list if new tasks are discovered during implementation
+- **ADDITIONAL FOR UI/UX TASKS:** Run design-review agent AGAIN after implementation to verify fixes
 
-**This workflow is NON-NEGOTIABLE and applies to:**
-- Bug fixes
-- Feature additions
-- Refactoring
-- Configuration changes
-- Documentation updates
-- ANY code or infrastructure modifications
-- **ESPECIALLY UI/UX changes** (see detailed UI/UX workflow below)
+---
+
+**This workflow applies to EVERY task type:**
+- ✅ Simple bug fixes (e.g., fixing import order in CSS)
+- ✅ Typo corrections
+- ✅ Configuration changes
+- ✅ Feature additions
+- ✅ Refactoring
+- ✅ Documentation updates
+- ✅ ANY code or infrastructure modifications
+- ✅ UI/UX changes (with additional design-review steps - see below)
+
+**Key principle:** The baseline 6-step workflow is **MANDATORY FOR ALL TASKS**. UI/UX tasks follow the same 6 steps but have **ADDITIONAL** design-review steps integrated into the baseline workflow.
 
 ---
 
@@ -369,29 +374,85 @@ This project uses specialized agents for different development tasks:
 
 ## Visual Design Guidelines
 
-**AWS Card Clash Inspired Aesthetic:**
-- Dark backgrounds (#1a1a2e) with bright saturated colors
-- Bold typography with text strokes and glow effects
-- Animated particle effects using PixiJS
-- Gradient buttons with hover glows
-- Two-layer rendering: PixiJS canvas + React DOM
+**⚠️ IMPORTANT: For complete styling documentation, see [`STYLING_GUIDE.md`](STYLING_GUIDE.md)**
+
+### Balatro-Inspired Retro Pixel Art Aesthetic
+
+**Art Style Philosophy:**
+- Vibrant, saturated colors with high contrast
+- Retro pixel art feel with modern polish
+- Playful, arcade-like atmosphere
+- Rich visual feedback and juicy animations
+- Nostalgic casino/card game vibes with tech twist
 
 **Color Palette:**
-- Orange: #FFA726 (primary brand color - "AGENT")
-- Blue: #42A5F5 (secondary brand color - "ARCHITECT")
-- Purple: #667eea
-- Pink: #f5576c
-- Teal: #00bcd4
-- White: #FFFFFF (text on dark backgrounds)
+```
+Backgrounds:
+- Primary:   #2d1b3d (deep purple-black, like Balatro's felt table)
+- Secondary: #1a0f24 (darker purple for depth)
+- Accent:    #4a2859 (rich purple highlight)
 
-**Typography:**
-- Use `font-black` for titles and important text
-- Text shadows for readability on dark backgrounds
-- Uppercase for game-like aesthetic
-- Responsive text sizes (text-7xl → text-9xl on larger screens)
+Card Types (Vibrant & Saturated):
+- Context:   Cyan/Teal      #00d9ff → #0088cc
+- Model:     Purple/Magenta #ff00ff → #9933ff
+- Tool:      Orange/Gold    #ffaa00 → #ff6600
+- Framework: Pink/Red       #ff1493 → #ff69b4
+- Guardrail: Green/Lime     #00ff88 → #00cc44
 
-**Animation Principles:**
-- Spring physics for bouncy, game-like feel (stiffness: 260, damping: 20)
-- Framer Motion for all UI animations
-- PixiJS for particle effects and background animations
-- Hover effects with scale and glow
+Effects:
+- Glow:      #ff00ff (bright magenta)
+- Success:   #00ff88 (neon green)
+- Error:     #ff3366 (hot pink-red)
+- Hover:     #ffff00 (yellow)
+- Selection: #ffffff (white)
+```
+
+**Typography (Pixel Fonts):**
+- Primary: "Press Start 2P" (Google Fonts - authentic retro gaming)
+- Secondary: "Silkscreen" (Google Fonts - clean pixel font)
+- Sizes: Logo 48px, Title 32px, Heading 24px, Body 14px, Card 12px, Small 10px
+
+**Animation Timing (Snappy & Juicy like Balatro):**
+- Hover: 100ms ease-out, scale 1.08, slight rotation (2-3°)
+- Tap/Click: 80ms ease-in, scale 0.95, bounce back
+- Placement: 300ms cubic-bezier with "pop" effect
+- Score counter: Rolling number animation with bounce
+
+**Visual Feedback:**
+- Particle bursts on successful actions (pixelated stars/sparkles)
+- Screen shake on errors or big moments (2-3px vibration)
+- Color flash transitions (white flash on placement)
+- Trail effects during drag (afterimage/motion blur)
+
+**Key Libraries:**
+- **NES.css**: 8-bit/NES-style UI components (buttons, containers, progress bars)
+- **NES.icons**: Pixel art icon set for retro aesthetic
+- **raster-react**: Authentic pixel art icons
+- **Framer Motion**: React animations with spring physics
+- **PixiJS**: Pixel-perfect WebGL rendering (antialias: false)
+
+**Styling Files:**
+- `tailwind.config.js` - Custom colors, fonts, animations
+- `index.css` - Base styles, NES.css imports, pixel art rendering
+- `theme.css` - CSS custom properties for theming
+- `animations.css` - Game-specific keyframe animations
+
+**Quick Reference:**
+```tsx
+// Tailwind classes
+<div className="bg-background-primary font-pixel text-card border-pixel shadow-pixel">
+<div className="bg-gradient-to-br from-card-model-light to-card-model-dark glow-model">
+
+// NES.css components
+<button className="nes-btn is-primary">Click</button>
+<progress className="nes-progress is-primary" value={50} max={100} />
+<div className="nes-container is-rounded is-dark">Content</div>
+<i className="nes-icon trophy"></i>
+
+// Animation classes
+<div className="card-hover card-place animate-score-bounce">
+```
+
+**Two-Layer Rendering:**
+- **Layer 1: PixiJS Canvas** - Board background, slot sprites, particle effects (pixel-perfect, no antialiasing)
+- **Layer 2: React DOM** - Draggable cards, HUD, menus, dialogs (Framer Motion animations)

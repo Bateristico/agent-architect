@@ -109,7 +109,7 @@ export const useGameStore = create<GameStore>()(
       resetProgress: () => set(initialState),
     }),
     {
-      name: 'agent-architect-storage', // localStorage key
+      name: 'agentcraft-storage', // localStorage key
     }
   )
 );

@@ -1,4 +1,4 @@
-// Content Type Definitions for Agent Architect
+// Content Type Definitions for AgentCraft
 // This file defines the structure of levels and cards
 
 export type CardType = 'context' | 'model' | 'tool' | 'framework' | 'guardrail';

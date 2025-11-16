@@ -1,0 +1,219 @@
+/**
+ * Balatro-Inspired Retro Pixel Art Theme
+ * CSS Variables for consistent theming across the application
+ */
+
+:root {
+  /* ========================================
+     COLOR PALETTE
+     ======================================== */
+
+  /* Backgrounds */
+  --bg-primary: #2d1b3d;      /* Deep purple-black (Balatro's felt table) */
+  --bg-secondary: #1a0f24;    /* Darker purple for depth */
+  --bg-accent: #4a2859;       /* Rich purple highlight */
+
+  /* Card Type Colors - Context (Cyan/Teal) */
+  --card-context-light: #00d9ff;  /* Bright neon blue */
+  --card-context-dark: #0088cc;   /* Deep teal */
+
+  /* Card Type Colors - Model (Purple/Magenta) */
+  --card-model-light: #ff00ff;    /* Vibrant magenta */
+  --card-model-dark: #9933ff;     /* Deep purple */
+
+  /* Card Type Colors - Tool (Orange/Gold) */
+  --card-tool-light: #ffaa00;     /* Warm arcade orange */
+  --card-tool-dark: #ff6600;      /* Deep orange */
+
+  /* Card Type Colors - Framework (Pink/Red) */
+  --card-framework-light: #ff1493; /* Hot pink */
+  --card-framework-dark: #ff69b4;  /* Salmon pink */
+
+  /* Card Type Colors - Guardrail (Green/Lime) */
+  --card-guardrail-light: #00ff88; /* Neon green */
+  --card-guardrail-dark: #00cc44;  /* Deep green */
+
+  /* UI Elements */
+  --text-primary: #ffffff;    /* Pure white for readability */
+  --text-secondary: #d4a5f5;  /* Soft lavender */
+  --border-color: #ffffff;    /* White borders (3-4px thickness) */
+  --shadow-color: #000000;    /* Hard black shadows (no blur) */
+
+  /* Effect Colors */
+  --effect-glow: #ff00ff;     /* Bright magenta glow */
+  --effect-success: #00ff88;  /* Neon green */
+  --effect-error: #ff3366;    /* Hot pink-red */
+  --effect-hover: #ffff00;    /* Yellow */
+  --effect-selection: #ffffff; /* White */
+
+  /* ========================================
+     TYPOGRAPHY
+     ======================================== */
+
+  /* Font Families */
+  --font-pixel: 'Press Start 2P', monospace;
+  --font-pixel-alt: 'Silkscreen', monospace;
+  --font-mono: monospace;
+
+  /* Font Sizes (Scaled for Pixel Art) */
+  --font-size-logo: 48px;      /* Large, impactful */
+  --font-size-title: 32px;     /* Page titles */
+  --font-size-heading: 24px;   /* Section headings */
+  --font-size-subheading: 16px; /* Subsections */
+  --font-size-body: 14px;      /* Body text */
+  --font-size-card: 12px;      /* Card content */
+  --font-size-small: 10px;     /* Small UI elements */
+
+  /* ========================================
+     SPACING & SIZING
+     ======================================== */
+
+  /* Border Widths */
+  --border-width-pixel: 3px;
+  --border-width-pixel-thick: 4px;
+
+  /* Border Radius (minimal for pixel art) */
+  --border-radius-none: 0px;
+  --border-radius-pixel: 2px;
+
+  /* Shadows (hard edges, no blur) */
+  --shadow-pixel: 4px 4px 0px 0px var(--shadow-color);
+  --shadow-pixel-hover: 6px 6px 0px 0px var(--shadow-color);
+  --shadow-text: 2px 2px 0px var(--shadow-color);
+  --shadow-text-thick: 4px 4px 0px var(--shadow-color);
+
+  /* ========================================
+     ANIMATION TIMING
+     ======================================== */
+
+  /* Snappy & Juicy like Balatro */
+  --timing-hover: 100ms;      /* Hover effects */
+  --timing-tap: 80ms;         /* Tap/click effects */
+  --timing-drag: 200ms;       /* Drag operations */
+  --timing-placement: 300ms;  /* Card placement */
+  --timing-reveal: 200ms;     /* Card reveal */
+  --timing-score: 600ms;      /* Score animations */
+
+  /* Easing Functions */
+  --easing-ease-out: ease-out;
+  --easing-ease-in: ease-in;
+  --easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --easing-pop: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+  /* ========================================
+     Z-INDEX LAYERS
+     ======================================== */
+
+  --z-background: 0;
+  --z-content: 1;
+  --z-card: 10;
+  --z-card-dragging: 50;
+  --z-hud: 100;
+  --z-modal: 500;
+  --z-scanline: 1000;
+  --z-tooltip: 1100;
+}
+
+/* ========================================
+   UTILITY CLASSES WITH CSS VARIABLES
+   ======================================== */
+
+/* Background utilities */
+.bg-balatro-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-balatro-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-balatro-accent {
+  background-color: var(--bg-accent);
+}
+
+/* Card gradient utilities */
+.card-gradient-context {
+  background: linear-gradient(135deg, var(--card-context-light), var(--card-context-dark));
+}
+
+.card-gradient-model {
+  background: linear-gradient(135deg, var(--card-model-light), var(--card-model-dark));
+}
+
+.card-gradient-tool {
+  background: linear-gradient(135deg, var(--card-tool-light), var(--card-tool-dark));
+}
+
+.card-gradient-framework {
+  background: linear-gradient(135deg, var(--card-framework-light), var(--card-framework-dark));
+}
+
+.card-gradient-guardrail {
+  background: linear-gradient(135deg, var(--card-guardrail-light), var(--card-guardrail-dark));
+}
+
+/* Glow utilities with CSS variables */
+.glow-context {
+  box-shadow: 0 0 20px var(--card-context-light), 0 0 40px var(--card-context-light);
+}
+
+.glow-model {
+  box-shadow: 0 0 20px var(--card-model-light), 0 0 40px var(--card-model-light);
+}
+
+.glow-tool {
+  box-shadow: 0 0 20px var(--card-tool-light), 0 0 40px var(--card-tool-light);
+}
+
+.glow-framework {
+  box-shadow: 0 0 20px var(--card-framework-light), 0 0 40px var(--card-framework-light);
+}
+
+.glow-guardrail {
+  box-shadow: 0 0 20px var(--card-guardrail-light), 0 0 40px var(--card-guardrail-light);
+}
+
+/* Typography utilities */
+.font-pixel {
+  font-family: var(--font-pixel);
+}
+
+.font-pixel-alt {
+  font-family: var(--font-pixel-alt);
+}
+
+/* Text size utilities */
+.text-logo {
+  font-size: var(--font-size-logo);
+  line-height: 1.2;
+}
+
+.text-title {
+  font-size: var(--font-size-title);
+  line-height: 1.3;
+}
+
+.text-heading {
+  font-size: var(--font-size-heading);
+  line-height: 1.4;
+}
+
+.text-subheading {
+  font-size: var(--font-size-subheading);
+  line-height: 1.5;
+}
+
+.text-body {
+  font-size: var(--font-size-body);
+  line-height: 1.6;
+}
+
+.text-card {
+  font-size: var(--font-size-card);
+  line-height: 1.5;
+}
+
+.text-small {
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+}

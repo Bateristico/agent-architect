@@ -35,7 +35,8 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onBack }) => {
         <div className="space-y-6">
           {/* Game Info */}
           <div className="bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-white mb-4">Agent Architect</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">AgentCraft</h2>
+            <p className="text-xl font-semibold text-orange-300 mb-4">Learn AI Design, Card by Card</p>
             <p className="text-white/80 mb-4">
               An educational card game that teaches AI/Agent system design through puzzle-solving gameplay.
               Learn best practices for context engineering, RAG, agent frameworks, and production-ready systems.
@@ -72,7 +73,7 @@ export const AboutScreen: React.FC<AboutScreenProps> = ({ onBack }) => {
           {/* GitHub Link */}
           <div className="text-center">
             <a
-              href="https://github.com/Bateristico/agent-architect"
+              href="https://github.com/yourusername/agentcraft"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20

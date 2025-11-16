@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Play, Settings, Info } from 'lucide-react';
 import { PixiBackground } from '../components/PixiBackground';
 
 interface MainMenuScreenProps {
@@ -8,182 +7,215 @@ interface MainMenuScreenProps {
   onAbout: () => void;
 }
 
-// Spring physics configuration for bouncy animations
-const springConfig = {
+// Arcade-snappy animation config
+const arcadeConfig = {
   type: "spring" as const,
-  stiffness: 260,
-  damping: 20
+  stiffness: 400,
+  damping: 25,
+  duration: 0.1
 };
 
 export const MainMenuScreen: React.FC<MainMenuScreenProps> = ({ onNavigate, onSettings, onAbout }) => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 relative overflow-hidden"
+         style={{
+           background: 'linear-gradient(135deg, #2d1b3d 0%, #1a0f24 50%, #4a2859 100%)'
+         }}>
       {/* PixiJS animated particle background */}
       <PixiBackground />
 
-      {/* Floating card decorations in background */}
-      <FloatingCards />
+      {/* Pixel grid background pattern */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
+          backgroundSize: '20px 20px',
+          zIndex: 0
+        }}
+      />
 
-      {/* Content wrapper with z-index to appear above floating cards */}
-      <div className="relative z-10 flex flex-col items-center">
-        {/* Title with gradient effect and stroke */}
-        <motion.div
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springConfig, duration: 0.8 }}
-          className="text-center mb-16"
-        >
-          <h1
-            className="text-7xl md:text-9xl font-black mb-2 uppercase tracking-tight"
+      {/* Content wrapper */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10"
+        style={{
+          background: 'rgba(45, 27, 61, 0.9)',
+          border: '4px solid #ffffff',
+          boxShadow: '8px 8px 0px #000000, 0 0 20px rgba(255, 255, 255, 0.1)',
+          padding: '60px',
+          backdropFilter: 'blur(2px)'
+        }}
+      >
+        <div className="text-center">
+          {/* Logo with animated rainbow background */}
+          <div className="relative inline-block mb-5">
+            <div
+              className="absolute -inset-4 rounded-lg opacity-30"
+              style={{
+                background: 'conic-gradient(#ffaa00 0deg, #00d9ff 72deg, #ff00ff 144deg, #ff1493 216deg, #00ff88 288deg, #ffaa00 360deg)',
+                animation: 'spin 8s linear infinite'
+              }}
+            />
+            <h1
+              className="relative z-10 text-5xl md:text-6xl font-black uppercase tracking-tight"
+              style={{
+                fontFamily: "'Press Start 2P', monospace",
+                color: '#ffaa00',
+                textShadow: `
+                  2px 2px 0px #000000,
+                  0 0 10px #ffaa00,
+                  0 0 20px #ffaa00,
+                  0 0 30px #ff6600
+                `,
+                animation: 'pulse-glow 2s ease-in-out infinite alternate'
+              }}
+            >
+              AGENTCRAFT
+            </h1>
+          </div>
+
+          {/* Subtitle */}
+          <p
+            className="text-sm md:text-base mb-10 uppercase tracking-wide"
             style={{
-              color: '#FFA726',
-              textShadow: `
-                5px 5px 0 #000000,
-                0 0 40px rgba(255, 167, 38, 0.8)
-              `
+              fontFamily: "'Silkscreen', monospace",
+              color: '#00d9ff',
+              textShadow: '1px 1px 0px #000000, 0 0 8px #00d9ff'
             }}
           >
-            AGENT
-          </h1>
-          <h1
-            className="text-7xl md:text-9xl font-black mb-8 uppercase tracking-tight"
-            style={{
-              color: '#42A5F5',
-              textShadow: `
-                5px 5px 0 #000000,
-                0 0 40px rgba(66, 165, 245, 0.8)
-              `
-            }}
-          >
-            ARCHITECT
-          </h1>
-          <p className="text-xl md:text-2xl font-bold tracking-wide uppercase"
-             style={{
-               color: '#FFFFFF',
-               textShadow: '3px 3px 6px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.5)'
-             }}
-          >
-            An AI Architecture Design Game
+            LEARN AI DESIGN, CARD BY CARD
           </p>
-        </motion.div>
 
-        {/* Menu Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springConfig, delay: 0.2 }}
-          className="flex flex-col gap-6 w-full max-w-2xl"
-        >
-          <MenuButton
-            icon={<Play className="w-12 h-12" />}
-            label="PLAY"
-            onClick={onNavigate}
-            delay={0.3}
-            gradient="from-orange-500 via-orange-400 to-yellow-400"
-            glowColor="rgba(255, 167, 38, 0.8)"
-          />
-          <MenuButton
-            icon={<Settings className="w-12 h-12" />}
-            label="SETTINGS"
-            onClick={onSettings}
-            delay={0.4}
-            gradient="from-blue-500 via-blue-400 to-cyan-400"
-            glowColor="rgba(66, 165, 245, 0.8)"
-          />
-          <MenuButton
-            icon={<Info className="w-12 h-12" />}
-            label="ABOUT"
-            onClick={onAbout}
-            delay={0.5}
-            gradient="from-purple-500 via-purple-400 to-pink-400"
-            glowColor="rgba(171, 71, 188, 0.8)"
-          />
-        </motion.div>
+          {/* Menu Buttons */}
+          <div className="space-y-6">
+            <MenuButton
+              icon="▶"
+              label="PLAY"
+              onClick={onNavigate}
+              delay={0.1}
+              bgColor="#00ff88"
+              textColor="#2d1b3d"
+              glowColor="#00ff88"
+            />
+            <MenuButton
+              icon="⚙"
+              label="SETTINGS"
+              onClick={onSettings}
+              delay={0.2}
+              bgColor="#00d9ff"
+              textColor="#2d1b3d"
+              glowColor="#00d9ff"
+            />
+            <MenuButton
+              icon="ℹ"
+              label="ABOUT"
+              onClick={onAbout}
+              delay={0.3}
+              bgColor="#ff00ff"
+              textColor="#ffffff"
+              glowColor="#ff00ff"
+            />
+          </div>
 
-        {/* Version */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-16 text-gray-400 text-sm font-medium"
-        >
-          v1.0.0 - Local Edition
-        </motion.div>
-      </div>
+          {/* Version */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 text-xs"
+            style={{
+              fontFamily: "'Silkscreen', monospace",
+              color: '#d4a5f5',
+              textShadow: '1px 1px 0px #000000'
+            }}
+          >
+            v1.0.0 - Local Edition
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* CSS Animations */}
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-glow {
+          from {
+            text-shadow:
+              2px 2px 0px #000000,
+              0 0 10px #ffaa00,
+              0 0 20px #ffaa00,
+              0 0 30px #ff6600;
+          }
+          to {
+            text-shadow:
+              2px 2px 0px #000000,
+              0 0 15px #ffaa00,
+              0 0 25px #ffaa00,
+              0 0 40px #ff6600;
+          }
+        }
+      `}</style>
     </div>
   );
 };
 
 interface MenuButtonProps {
-  icon: React.ReactNode;
+  icon: string;
   label: string;
   onClick: () => void;
   delay: number;
-  gradient: string;
+  bgColor: string;
+  textColor: string;
   glowColor: string;
 }
 
-const MenuButton: React.FC<MenuButtonProps> = ({ icon, label, onClick, delay, gradient, glowColor }) => {
+const MenuButton: React.FC<MenuButtonProps> = ({ icon, label, onClick, delay, bgColor, textColor, glowColor }) => {
   return (
     <motion.button
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ ...springConfig, delay }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ ...arcadeConfig, delay }}
       whileHover={{
-        scale: 1.05,
-        boxShadow: `0 0 40px ${glowColor}, 0 0 80px ${glowColor}`
+        scale: 1.08,
+        rotate: 1,
+        boxShadow: `6px 6px 0px #000000, 0 0 15px ${glowColor}`,
+        outline: `2px solid ${glowColor}`,
+        transition: { duration: 0.1 }
       }}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{
+        scale: 0.95,
+        boxShadow: '2px 2px 0px #000000',
+        transition: { duration: 0.08 }
+      }}
       onClick={onClick}
-      className={`flex items-center justify-center gap-6 bg-gradient-to-r ${gradient}
-                 rounded-2xl px-12 py-8 text-white text-4xl font-black uppercase
-                 shadow-lg hover:shadow-2xl transition-all duration-200
-                 border-4 border-white/30`}
+      className="w-64 mx-auto block px-8 py-4 text-sm font-black uppercase relative overflow-hidden"
       style={{
-        boxShadow: `0 0 25px ${glowColor}, inset 0 2px 10px rgba(255, 255, 255, 0.3)`,
-        textShadow: '3px 3px 6px rgba(0, 0, 0, 0.8), 0 0 10px rgba(255, 255, 255, 0.5)'
+        fontFamily: "'Press Start 2P', monospace",
+        backgroundColor: bgColor,
+        color: textColor,
+        border: `4px solid ${bgColor}`,
+        boxShadow: '4px 4px 0px #000000'
       }}
     >
-      {icon}
-      <span>{label}</span>
+      <span className="relative z-10">
+        {icon} {label}
+      </span>
+
+      {/* Shine effect overlay */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        initial={{ x: '-100%' }}
+        whileHover={{ x: '100%' }}
+        transition={{ duration: 0.2 }}
+        style={{
+          background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)'
+        }}
+      />
     </motion.button>
-  );
-};
-
-// Floating card decorations component
-const FloatingCards: React.FC = () => {
-  const cards = [
-    { id: 1, x: '10%', y: '20%', delay: 0, color: 'from-purple-500/20 to-pink-500/20' },
-    { id: 2, x: '85%', y: '15%', delay: 0.5, color: 'from-blue-500/20 to-cyan-500/20' },
-    { id: 3, x: '15%', y: '75%', delay: 1, color: 'from-pink-500/20 to-orange-500/20' },
-    { id: 4, x: '80%', y: '70%', delay: 1.5, color: 'from-cyan-500/20 to-purple-500/20' },
-  ];
-
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {cards.map((card) => (
-        <motion.div
-          key={card.id}
-          className={`absolute w-24 h-32 bg-gradient-to-br ${card.color} rounded-lg backdrop-blur-sm border border-white/10`}
-          style={{
-            left: card.x,
-            top: card.y,
-          }}
-          initial={{ opacity: 0, scale: 0, rotate: -15 }}
-          animate={{
-            opacity: [0.3, 0.5, 0.3],
-            scale: [1, 1.1, 1],
-            rotate: [-15, 15, -15],
-            y: [0, -20, 0],
-          }}
-          transition={{
-            duration: 8,
-            delay: card.delay,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-      ))}
-    </div>
   );
 };

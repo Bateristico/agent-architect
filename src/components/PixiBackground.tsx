@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { Application, Graphics, Container } from 'pixi.js';
+import { Application, Graphics } from 'pixi.js';
 
 interface Particle {
   x: number;
@@ -19,6 +19,7 @@ export const PixiBackground: React.FC = () => {
 
     let app: Application | null = null;
     let mounted = true;
+    let initialized = false;
 
     const init = async () => {
       try {
@@ -34,8 +35,11 @@ export const PixiBackground: React.FC = () => {
           resolution: window.devicePixelRatio || 1,
         });
 
+        // Mark as initialized after init completes
+        initialized = true;
+
         if (!mounted || !canvasRef.current) {
-          if (app) {
+          if (app && app.renderer) {
             app.destroy(true);
           }
           return;
@@ -103,7 +107,7 @@ export const PixiBackground: React.FC = () => {
 
         // Handle window resize
         const handleResize = () => {
-          if (app && mounted) {
+          if (app && app.renderer && mounted && initialized) {
             app.renderer.resize(window.innerWidth, window.innerHeight);
           }
         };
@@ -114,6 +118,7 @@ export const PixiBackground: React.FC = () => {
         };
       } catch (error) {
         console.error('PixiJS initialization error:', error);
+        initialized = false;
       }
     };
 
@@ -124,9 +129,18 @@ export const PixiBackground: React.FC = () => {
       mounted = false;
       if (app) {
         try {
-          app.destroy(true);
+          // Only destroy if initialization completed
+          if (initialized && app.renderer) {
+            app.destroy(true, { children: true });
+          } else if (app.renderer) {
+            // If partially initialized, still try to destroy
+            app.destroy(true);
+          }
         } catch (error) {
           console.error('PixiJS cleanup error:', error);
+        } finally {
+          // Ensure reference is cleared
+          app = null;
         }
       }
     };

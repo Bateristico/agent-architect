@@ -9,7 +9,7 @@ interface TutorialProps {
 
 const tutorialSteps = [
   {
-    title: 'Welcome to Agent Architect!',
+    title: 'Welcome to AgentCraft!',
     description: 'Learn how to design AI agents by combining the right components. Each level presents a challenge that teaches you key concepts.',
     icon: Sparkles,
     color: 'text-purple-400',
