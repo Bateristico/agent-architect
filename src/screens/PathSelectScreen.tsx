@@ -1,3 +1,4 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Search, Bot, Rocket } from 'lucide-react';
 import { useGameStore } from '../store/gameStore';
@@ -23,7 +24,6 @@ const learningPaths: LearningPath[] = [
     description: 'Learn the fundamentals: Context, models, and basic tools',
     icon: 'BookOpen',
     color: 'from-blue-500 to-cyan-500',
-    glowColor: 'rgba(66, 165, 245, 0.8)',
     levels: [1, 2, 3],
   },
   {
@@ -32,7 +32,6 @@ const learningPaths: LearningPath[] = [
     description: 'Master retrieval strategies and data sources',
     icon: 'Search',
     color: 'from-green-500 to-emerald-500',
-    glowColor: 'rgba(16, 185, 129, 0.8)',
     levels: [4, 5, 6],
   },
   {
@@ -41,7 +40,6 @@ const learningPaths: LearningPath[] = [
     description: 'Build with frameworks and tool orchestration',
     icon: 'Bot',
     color: 'from-purple-500 to-pink-500',
-    glowColor: 'rgba(168, 85, 247, 0.8)',
     levels: [7, 8, 9],
   },
   {
@@ -50,7 +48,6 @@ const learningPaths: LearningPath[] = [
     description: 'Optimize for cost, performance, and scale',
     icon: 'Rocket',
     color: 'from-orange-500 to-red-500',
-    glowColor: 'rgba(249, 115, 22, 0.8)',
     levels: [10, 11, 12],
   },
 ];
@@ -70,9 +67,19 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
   };
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-8 relative bg-[#1a1a2e]">
+    <div className="min-h-screen flex flex-col px-4 py-8 relative bg-[#2d1b3d]">
       {/* PixiJS animated particle background */}
       <PixiBackground />
+
+      {/* Pixel grid background pattern */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          backgroundImage: 'radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 0)',
+          backgroundSize: '20px 20px',
+          zIndex: 0
+        }}
+      />
 
       {/* Content wrapper with z-index to appear above background */}
       <div className="relative z-10 flex flex-col">
@@ -80,23 +87,23 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ ...springConfig }}
+          transition={{ duration: 0.15, ease: "easeOut" }}
           className="mb-8"
         >
           <motion.button
             onClick={onBack}
-            whileHover={{ scale: 1.05, x: -5 }}
+            whileHover={{ scale: 1.05, x: -3 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-3 bg-gradient-to-r from-purple-500 to-pink-500
-                       rounded-xl px-6 py-3 text-white text-xl font-black uppercase
-                       shadow-lg hover:shadow-2xl transition-all duration-200
-                       border-4 border-white/30"
+            className="flex items-center gap-3 bg-[#2d1b3d] text-white text-sm font-bold uppercase
+                       border-4 border-white font-['Press_Start_2P']"
             style={{
-              boxShadow: '0 0 25px rgba(168, 85, 247, 0.6), inset 0 2px 10px rgba(255, 255, 255, 0.3)',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 0.8)'
+              boxShadow: '4px 4px 0px #000000',
+              fontFamily: "'Press Start 2P', monospace",
+              padding: '12px 20px',
+              transition: 'all 100ms ease-out'
             }}
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </motion.button>
         </motion.div>
@@ -105,29 +112,28 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ...springConfig, delay: 0.1 }}
+          transition={{ duration: 0.15, ease: "easeOut", delay: 0.1 }}
           className="text-center mb-16"
         >
           <h1
-            className="text-6xl md:text-8xl font-black mb-4 uppercase tracking-tight"
+            className="text-3xl md:text-5xl font-bold mb-6 uppercase tracking-tight"
             style={{
-              color: '#FFA726',
-              textShadow: `
-                5px 5px 0 #000000,
-                0 0 40px rgba(255, 167, 38, 0.8)
-              `
+              color: '#ffaa00',
+              textShadow: '4px 4px 0px #000000, 0 0 10px #ffaa00',
+              fontFamily: "'Press Start 2P', monospace"
             }}
           >
             Choose Your Path
           </h1>
           <p
-            className="text-xl md:text-2xl font-bold tracking-wide uppercase"
+            className="text-xs md:text-sm font-bold tracking-wide uppercase"
             style={{
               color: '#FFFFFF',
-              textShadow: '3px 3px 6px rgba(0, 0, 0, 1), 0 0 20px rgba(255, 255, 255, 0.5)'
+              textShadow: '2px 2px 0px #000000',
+              fontFamily: "'Press Start 2P', monospace"
             }}
           >
-            Select a learning path to begin your journey
+            Select a learning path to begin
           </p>
         </motion.div>
 
@@ -167,13 +173,13 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
           className="text-center"
         >
           <p
-            className="text-lg font-bold uppercase"
+            className="text-xs font-bold uppercase"
             style={{
-              color: '#FFFFFF',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 1)'
+              color: '#d4a5f5',
+              fontFamily: "'Silkscreen', monospace"
             }}
           >
-            Complete levels to unlock new challenges and master AI system design
+            Complete levels to unlock new challenges
           </p>
         </motion.div>
       </div>
@@ -182,7 +188,7 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
 };
 
 interface PathCardProps {
-  path: LearningPath & { glowColor: string };
+  path: LearningPath;
   icon: React.ElementType;
   completedLevels: number;
   totalLevels: number;
@@ -198,49 +204,72 @@ const PathCard: React.FC<PathCardProps> = ({
   index,
   onClick
 }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  // Get border color based on path
+  const getBorderColor = () => {
+    switch(path.id) {
+      case 'beginner-architect': return '#00d9ff'; // context cyan
+      case 'rag-specialist': return '#00ff88'; // guardrail green
+      case 'agentic-developer': return '#ff00ff'; // model purple
+      case 'production-engineer': return '#ffaa00'; // tool orange
+      default: return '#ffffff';
+    }
+  };
+
+  const borderColor = getBorderColor();
+
   return (
     <motion.button
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ ...springConfig, delay: 0.3 + index * 0.1 }}
+      transition={{ duration: 0.15, ease: "easeOut", delay: 0.3 + index * 0.1 }}
       whileHover={{
         scale: 1.05,
-        y: -8,
+        y: -4,
+        rotate: 1,
+        transition: { duration: 0.15, ease: "easeOut" }
       }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{
+        scale: 0.98,
+        transition: { duration: 0.08, ease: "easeIn" }
+      }}
       onClick={onClick}
-      className="relative bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm
-                 rounded-2xl p-8 text-left overflow-hidden group
-                 border-4 border-white/30 hover:border-white/50 transition-all duration-200"
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      className="relative bg-[#2d1b3d]/90 backdrop-blur-sm
+                 p-6 text-left overflow-hidden group"
       style={{
-        boxShadow: `0 0 30px ${path.glowColor}40, inset 0 2px 10px rgba(255, 255, 255, 0.1)`,
+        border: `4px solid ${borderColor}`,
+        boxShadow: isHovered
+          ? `6px 6px 0px #000000, 0 0 20px ${borderColor}`
+          : `4px 4px 0px #000000`,
+        outline: isHovered ? `2px solid ${borderColor}` : 'none',
+        transition: 'box-shadow 150ms ease-out, outline 150ms ease-out',
+        cursor: 'pointer'
       }}
     >
-      {/* Animated gradient background on hover */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-br ${path.color} opacity-0
-                   group-hover:opacity-30 transition-opacity duration-300`}
-      />
-
       {/* Content */}
       <div className="relative z-10">
         {/* Icon and Progress */}
-        <div className="flex items-start justify-between mb-6">
-          <motion.div
-            className={`p-4 rounded-xl bg-gradient-to-br ${path.color} shadow-lg`}
-            whileHover={{ rotate: [0, -10, 10, 0], scale: 1.1 }}
-            transition={{ duration: 0.5 }}
+        <div className="flex items-start justify-between mb-4">
+          <div
+            className="p-3 bg-[#4a2859]"
             style={{
-              boxShadow: `0 0 20px ${path.glowColor}, inset 0 2px 10px rgba(255, 255, 255, 0.3)`
+              border: `4px solid ${borderColor}`,
+              boxShadow: '4px 4px 0px #000000'
             }}
           >
-            <Icon className="w-10 h-10 text-white" />
-          </motion.div>
+            <Icon className="w-8 h-8 text-white" />
+          </div>
           <div
-            className="text-xl font-black uppercase px-4 py-2 rounded-lg bg-black/40 backdrop-blur-sm border-2 border-white/30"
+            className="text-sm font-bold uppercase px-3 py-1 bg-[#4a2859]"
             style={{
               color: '#FFFFFF',
-              textShadow: '2px 2px 4px rgba(0, 0, 0, 1)'
+              textShadow: '2px 2px 0px #000000',
+              border: '2px solid #ffffff',
+              boxShadow: '2px 2px 0px #000000',
+              fontFamily: "'Press Start 2P', monospace"
             }}
           >
             {completedLevels}/{totalLevels}
@@ -249,10 +278,12 @@ const PathCard: React.FC<PathCardProps> = ({
 
         {/* Title */}
         <h3
-          className="text-3xl md:text-4xl font-black mb-3 uppercase"
+          className="text-lg md:text-xl font-bold mb-3 uppercase"
           style={{
-            color: '#FFFFFF',
-            textShadow: '3px 3px 6px rgba(0, 0, 0, 1), 0 0 15px rgba(255, 255, 255, 0.3)'
+            color: borderColor,
+            textShadow: '2px 2px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            lineHeight: '1.4'
           }}
         >
           {path.name}
@@ -260,10 +291,11 @@ const PathCard: React.FC<PathCardProps> = ({
 
         {/* Description */}
         <p
-          className="text-lg font-bold mb-6"
+          className="text-xs mb-4"
           style={{
-            color: '#E0E0E0',
-            textShadow: '2px 2px 4px rgba(0, 0, 0, 1)'
+            color: '#d4a5f5',
+            fontFamily: "'Silkscreen', monospace",
+            lineHeight: '1.4'
           }}
         >
           {path.description}
@@ -271,36 +303,38 @@ const PathCard: React.FC<PathCardProps> = ({
 
         {/* Progress Bar */}
         <div className="relative">
-          <div className="w-full bg-black/50 rounded-full h-4 border-2 border-white/30 overflow-hidden">
+          <div
+            className="w-full bg-black/50 h-3 overflow-hidden"
+            style={{
+              border: '2px solid #ffffff',
+              boxShadow: 'inset 2px 2px 0px #000000'
+            }}
+          >
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${(completedLevels / totalLevels) * 100}%` }}
               transition={{ duration: 1, delay: 0.5 + index * 0.1, ease: "easeOut" }}
-              className={`h-full bg-gradient-to-r ${path.color} relative`}
+              className="h-full relative"
               style={{
-                boxShadow: `0 0 10px ${path.glowColor}`
+                backgroundColor: borderColor,
+                boxShadow: `0 0 10px ${borderColor}`
               }}
-            >
-              {/* Shine effect on progress bar */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-pulse" />
-            </motion.div>
+            />
           </div>
           {/* Progress percentage text */}
           <div
-            className="absolute -top-1 left-1/2 transform -translate-x-1/2 -translate-y-full text-sm font-black uppercase px-2 py-1 rounded bg-black/60 border border-white/30"
+            className="absolute -top-1 left-1/2 transform -translate-x-1/2 -translate-y-full text-xs font-bold uppercase px-2 py-0.5 bg-[#4a2859]"
             style={{
               color: '#FFFFFF',
-              textShadow: '1px 1px 2px rgba(0, 0, 0, 1)'
+              textShadow: '1px 1px 0px #000000',
+              border: '2px solid #ffffff',
+              boxShadow: '2px 2px 0px #000000',
+              fontFamily: "'Press Start 2P', monospace"
             }}
           >
             {Math.round((completedLevels / totalLevels) * 100)}%
           </div>
         </div>
-      </div>
-
-      {/* Corner decoration */}
-      <div className="absolute top-0 right-0 w-32 h-32 opacity-20">
-        <div className={`absolute inset-0 bg-gradient-to-br ${path.color} rounded-bl-full`} />
       </div>
     </motion.button>
   );
