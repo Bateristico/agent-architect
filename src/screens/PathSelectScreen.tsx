@@ -146,7 +146,7 @@ export const PathSelectScreen: React.FC<PathSelectScreenProps> = ({ onBack, onSe
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ...springConfig, delay: 0.2 }}
-          className="grid grid-cols-2 gap-12 max-w-5xl mx-auto w-full mb-12 px-4"
+          className="grid grid-cols-2 gap-4 max-w-5xl mx-auto w-full mb-4 px-4"
           style={{ alignItems: 'center' }}
         >
           {learningPaths.map((path, index) => {
@@ -252,8 +252,8 @@ const PathCard: React.FC<PathCardProps> = ({
         padding: '1.5rem',
         marginLeft: isLeftColumn ? '4rem' : '1rem',
         marginRight: isLeftColumn ? '1rem' : '4rem',
-        marginTop: '4rem',
-        marginBottom: '4rem',
+        marginTop: '1rem',
+        marginBottom: '1rem',
         border: `0.25rem solid ${borderColor}`,
         boxShadow: isHovered
           ? `0.375rem 0.375rem 0 #000000, 0 0 1.25rem ${borderColor}`
@@ -287,7 +287,7 @@ const PathCard: React.FC<PathCardProps> = ({
                 fontFamily: "'Press Start 2P', monospace",
                 lineHeight: '1.4',
                 fontSize: '1.25rem',
-                paddingLeft: '0.5rem'
+                paddingLeft: '1.5rem'
               }}
             >
               {path.name}

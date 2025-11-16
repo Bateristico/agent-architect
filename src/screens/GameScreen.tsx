@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { CARDS } from '../game/cards';
 import { getLevelByNumber } from '../content';
 import { useGameStore } from '../store/gameStore';
@@ -251,7 +252,12 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
       />
 
       {/* Content wrapper */}
-      <div className="relative z-10 flex flex-col h-full">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        className="relative z-10 flex flex-col h-full"
+      >
         {/* Header HUD */}
         <GameHUD
           levelNumber={levelData.number}
@@ -292,7 +298,7 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
             onReset={handleReset}
           />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

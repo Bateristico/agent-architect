@@ -72,7 +72,7 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
           <span>Back</span>
         </motion.button>
         <div
-          className="flex items-center gap-2 px-3 py-2 text-xs"
+          className="flex items-center gap-2 px-3 py-2 text-xs pl-3"
           style={{
             background: 'var(--muted)',
             border: '2px solid var(--border)',
@@ -81,7 +81,7 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
             color: 'var(--foreground)',
           }}
         >
-          🎯 <span>LEVEL {levelNumber}</span>
+          🎯 <span className="pl-1">LEVEL {levelNumber}</span>
         </div>
       </div>
 

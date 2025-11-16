@@ -82,7 +82,7 @@ export const GameFooter: React.FC<GameFooterProps> = React.memo(
     return (
       <div className="flex-shrink-0 overflow-x-auto p-2" style={{ height: '190px' }}>
         <div
-          className="flex gap-5 items-start p-2 justify-center"
+          className="flex gap-3 items-start p-2 justify-center"
           style={{
             background: 'var(--card)',
             border: '3px solid var(--border)',

@@ -59,16 +59,17 @@ export const GameControls: React.FC<GameControlsProps> = React.memo(
             📋 SCENARIO
           </div>
           <div
-            className="flex-1 text-[10px] leading-normal overflow-y-auto font-bold px-2"
+            className="flex-1 text-[10px] leading-normal overflow-y-auto font-bold px-2 pt-1"
             style={{
               color: 'var(--foreground)',
               fontFamily: 'var(--font-sans)',
+              marginTop: '0.5rem',
             }}
           >
             {scenario}
           </div>
           <div
-            className="flex gap-3 text-[10px] border-t-2 pt-2 px-2"
+            className="flex gap-3 text-[9px] border-t-2 pt-2 px-2"
             style={{ borderColor: 'var(--border)' }}
           >
             <div className="flex items-center gap-1">
@@ -106,7 +107,7 @@ export const GameControls: React.FC<GameControlsProps> = React.memo(
             disabled={!canSubmit}
             whileHover={canSubmit ? { scale: 1.05, y: -2 } : {}}
             whileTap={canSubmit ? { scale: 0.95 } : {}}
-            className="py-2 px-3 text-[10px] font-bold uppercase"
+            className="py-2 px-3 text-[9px] font-bold uppercase"
             style={{
               fontFamily: 'var(--font-sans)',
               background: canSubmit ? 'var(--success-color)' : 'var(--muted)',
@@ -127,7 +128,7 @@ export const GameControls: React.FC<GameControlsProps> = React.memo(
             onClick={onHint}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="py-2 px-3 text-[10px] font-bold uppercase"
+            className="py-2 px-3 text-[9px] font-bold uppercase"
             style={{
               fontFamily: 'var(--font-sans)',
               background: 'var(--accent)',
@@ -144,7 +145,7 @@ export const GameControls: React.FC<GameControlsProps> = React.memo(
             onClick={onReset}
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="py-2 px-3 text-[10px] font-bold uppercase"
+            className="py-2 px-3 text-[9px] font-bold uppercase"
             style={{
               fontFamily: 'var(--font-sans)',
               background: 'var(--destructive-color)',
