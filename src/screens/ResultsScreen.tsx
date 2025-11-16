@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
-import { Star, RotateCcw, Home, ArrowRight, Target, Zap, Shield, TrendingUp } from 'lucide-react';
+import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { Star, RotateCcw, Home, ArrowRight, Target, Zap, Shield, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type { LevelResult } from '../game/GameSimulator';
 import type { ILevel } from '../game/types';
 
@@ -54,7 +55,7 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
         </div>
 
         <div className="text-center">
-          <div className="text-6xl font-bold text-white mb-2">{totalScore}</div>
+          <CountUpNumber value={totalScore} duration={1000} delay={600} className="text-6xl font-bold text-white mb-2" />
           <div className="text-white/60 text-lg">out of 100 points</div>
         </div>
       </motion.div>
@@ -114,20 +115,35 @@ export const ResultsScreen: React.FC<ResultsScreenProps> = ({
           {/* Feedback */}
           {feedback.length > 0 && (
             <div className="mt-6 pt-6 border-t border-white/10">
-              <h3 className="text-lg font-semibold text-white mb-3">Feedback</h3>
-              <div className="space-y-2">
-                {feedback.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.9 + index * 0.05 }}
-                    className="text-white/80 text-sm flex items-start gap-2"
-                  >
-                    <span className="text-white/40 flex-shrink-0">•</span>
-                    <span>{item}</span>
-                  </motion.div>
-                ))}
+              <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-yellow-400" />
+                {totalScore < 100 ? 'Areas for Improvement' : 'What You Did Right'}
+              </h3>
+              <div className="space-y-3">
+                {feedback.map((item, index) => {
+                  const isPositive = item.toLowerCase().includes('good') ||
+                                   item.toLowerCase().includes('excellent') ||
+                                   item.toLowerCase().includes('perfect');
+
+                  return (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.9 + index * 0.05 }}
+                      className={`flex items-start gap-3 p-3 rounded-lg ${
+                        isPositive ? 'bg-green-500/10 border border-green-500/20' : 'bg-yellow-500/10 border border-yellow-500/20'
+                      }`}
+                    >
+                      {isPositive ? (
+                        <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      ) : (
+                        <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                      )}
+                      <span className="text-white/90 text-sm leading-relaxed">{item}</span>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -204,27 +220,76 @@ const ScoreCard: React.FC<ScoreCardProps> = ({ icon, label, score, maxScore, col
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay }}
-      className="bg-white/5 rounded-lg p-4"
+      className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors duration-300"
     >
       <div className="flex items-center gap-3 mb-3">
-        <div className={color}>{icon}</div>
-        <div>
+        <motion.div
+          initial={{ rotate: -180, opacity: 0 }}
+          animate={{ rotate: 0, opacity: 1 }}
+          transition={{ delay: delay + 0.1, type: 'spring' }}
+          className={color}
+        >
+          {icon}
+        </motion.div>
+        <div className="flex-1">
           <div className="text-white font-semibold">{label}</div>
-          <div className="text-white/60 text-sm">
-            {score} / {maxScore} pts
+          <div className="text-white/60 text-sm flex items-center gap-1">
+            <CountUpNumber value={score} duration={800} delay={delay * 1000 + 200} className="inline" />
+            <span>/</span>
+            <span>{maxScore} pts</span>
           </div>
         </div>
+        <div className={`text-2xl font-bold ${color}`}>
+          {Math.round(percentage)}%
+        </div>
       </div>
-      <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+      <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
         <motion.div
-          className={`h-full ${color.replace('text-', 'bg-')}`}
+          className={`h-full ${color.replace('text-', 'bg-')} rounded-full`}
           initial={{ width: 0 }}
           animate={{ width: `${percentage}%` }}
-          transition={{ delay: delay + 0.2, duration: 0.5 }}
+          transition={{ delay: delay + 0.3, duration: 0.8, ease: 'easeOut' }}
         />
       </div>
     </motion.div>
   );
+};
+
+// Count-up animation component
+interface CountUpNumberProps {
+  value: number;
+  duration?: number;
+  delay?: number;
+  className?: string;
+}
+
+const CountUpNumber: React.FC<CountUpNumberProps> = ({ value, duration = 1000, delay = 0, className = '' }) => {
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const controls = animate(count, value, {
+        duration: duration / 1000,
+        ease: 'easeOut',
+      });
+
+      return controls.stop;
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [value, duration, delay, count]);
+
+  useEffect(() => {
+    const unsubscribe = rounded.on('change', (latest) => {
+      setDisplayValue(latest);
+    });
+
+    return unsubscribe;
+  }, [rounded]);
+
+  return <div className={className}>{displayValue}</div>;
 };
 
 // Get learning point based on level and performance

@@ -15,30 +15,40 @@ const SLOT_CONFIG = {
     label: 'Context',
     icon: Sparkles,
     color: 'border-blue-400 bg-blue-500/10',
+    hoverColor: 'hover:border-blue-300 hover:bg-blue-500/20',
+    iconColor: 'text-blue-300',
     position: { row: 1, col: 1 },
   },
   model: {
     label: 'Model',
     icon: Zap,
     color: 'border-purple-400 bg-purple-500/10',
+    hoverColor: 'hover:border-purple-300 hover:bg-purple-500/20',
+    iconColor: 'text-purple-300',
     position: { row: 1, col: 2 },
   },
   tools: {
     label: 'Tools',
     icon: Wrench,
-    color: 'border-green-400 bg-green-500/10',
+    color: 'border-teal-400 bg-teal-500/10',
+    hoverColor: 'hover:border-teal-300 hover:bg-teal-500/20',
+    iconColor: 'text-teal-300',
     position: { row: 2, col: 1 },
   },
   framework: {
     label: 'Framework',
     icon: GitBranch,
     color: 'border-orange-400 bg-orange-500/10',
+    hoverColor: 'hover:border-orange-300 hover:bg-orange-500/20',
+    iconColor: 'text-orange-300',
     position: { row: 2, col: 2 },
   },
   guardrails: {
     label: 'Guardrails',
     icon: Shield,
-    color: 'border-gray-400 bg-gray-500/10',
+    color: 'border-red-400 bg-red-500/10',
+    hoverColor: 'hover:border-red-300 hover:bg-red-500/20',
+    iconColor: 'text-red-300',
     position: { row: 2, col: 3 },
   },
 };
@@ -156,27 +166,42 @@ const BoardSlot: React.FC<BoardSlotProps> = ({ slotType, config, card, required,
   return (
     <motion.div
       data-slot={slotType}
-      whileHover={{ scale: 1.02 }}
+      whileHover={!card ? { scale: 1.01 } : {}}
       onClick={onClick}
+      initial={false}
       className={`
         relative min-h-[240px] rounded-lg border-2 ${config.color}
         flex flex-col items-center justify-center p-4
-        ${!card ? 'cursor-pointer hover:border-white/40' : ''}
+        ${!card ? `cursor-pointer ${config.hoverColor}` : ''}
         ${isHighlighted ? 'ring-4 ring-white/60 ring-offset-2 ring-offset-transparent shadow-xl' : ''}
-        transition-all
+        ${card ? 'border-dashed' : 'border-dashed'}
+        transition-colors duration-200
       `}
     >
       {/* Highlight indicator when dragging */}
       {isHighlighted && !card && (
-        <div className="absolute inset-0 bg-white/10 rounded-lg animate-pulse" />
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="absolute inset-0 bg-white/10 rounded-lg animate-pulse"
+        />
       )}
 
       {card ? (
-        // Show placed card
-        <div className="relative flex items-center justify-center">
+        // Show placed card with snap animation
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          className="relative flex items-center justify-center"
+        >
           <Card card={card} isInHand={false} />
           {/* Remove button */}
-          <button
+          <motion.button
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={(e) => {
               e.stopPropagation();
               onRemove();
@@ -184,12 +209,12 @@ const BoardSlot: React.FC<BoardSlotProps> = ({ slotType, config, card, required,
             className="absolute -top-2 -right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold shadow-lg transition-all z-10"
           >
             ×
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       ) : (
         // Show empty slot
         <div className="text-center">
-          <Icon className="w-12 h-12 text-white/30 mx-auto mb-3" />
+          <Icon className={`w-12 h-12 ${config.iconColor} mx-auto mb-3 transition-colors duration-300`} />
           <h3 className="text-white font-semibold mb-1">{config.label}</h3>
           {required && (
             <span className="text-xs text-red-300 font-semibold">Required</span>

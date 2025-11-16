@@ -11,31 +11,36 @@ interface CardProps {
   isDragging?: boolean;
 }
 
-const CARD_COLORS: Record<string, { gradient: string; border: string; icon: string }> = {
+const CARD_COLORS: Record<string, { gradient: string; border: string; icon: string; shadow: string }> = {
   context: {
-    gradient: 'from-blue-500 to-cyan-500',
+    gradient: 'from-blue-500 to-blue-600',
     border: 'border-blue-400',
-    icon: 'text-blue-300',
+    icon: 'text-blue-200',
+    shadow: 'hover:shadow-blue-500/50',
   },
   model: {
-    gradient: 'from-purple-500 to-pink-500',
+    gradient: 'from-purple-500 to-purple-600',
     border: 'border-purple-400',
-    icon: 'text-purple-300',
+    icon: 'text-purple-200',
+    shadow: 'hover:shadow-purple-500/50',
   },
   tool: {
-    gradient: 'from-green-500 to-emerald-500',
-    border: 'border-green-400',
-    icon: 'text-green-300',
+    gradient: 'from-teal-500 to-teal-600',
+    border: 'border-teal-400',
+    icon: 'text-teal-200',
+    shadow: 'hover:shadow-teal-500/50',
   },
   framework: {
-    gradient: 'from-orange-500 to-red-500',
+    gradient: 'from-orange-500 to-orange-600',
     border: 'border-orange-400',
-    icon: 'text-orange-300',
+    icon: 'text-orange-200',
+    shadow: 'hover:shadow-orange-500/50',
   },
   guardrail: {
-    gradient: 'from-gray-500 to-slate-600',
-    border: 'border-gray-400',
-    icon: 'text-gray-300',
+    gradient: 'from-red-500 to-red-600',
+    border: 'border-red-400',
+    icon: 'text-red-200',
+    shadow: 'hover:shadow-red-500/50',
   },
 };
 
@@ -62,19 +67,19 @@ export const Card: React.FC<CardProps> = ({
     <motion.div
       drag={isInHand}
       dragMomentum={false}
-      dragElastic={0.1}
-      dragTransition={{ bounceStiffness: 300, bounceDamping: 30 }}
+      dragElastic={0}
+      dragTransition={{ power: 0, timeConstant: 0 }}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
-      whileHover={isInHand && !isDragging ? { scale: 1.05, y: -5 } : {}}
-      whileTap={isInHand && !isDragging ? { scale: 0.95 } : {}}
-      whileDrag={{ scale: 1.1, rotate: 5, zIndex: 9999 }}
+      whileHover={isInHand && !isDragging ? { scale: 1.03, y: -3 } : {}}
+      whileTap={isInHand && !isDragging ? { scale: 0.98 } : {}}
+      whileDrag={{ scale: 1.05, zIndex: 9999 }}
       onClick={onClick}
       animate={isDragging ? {} : { x: 0, y: 0 }}
       className={`
         w-[150px] h-[200px] rounded-lg overflow-hidden
         ${isInHand ? 'cursor-grab active:cursor-grabbing' : 'cursor-default'}
-        shadow-lg hover:shadow-xl transition-shadow
+        shadow-lg ${!isDragging ? colors.shadow : ''}
         ${isDragging ? 'shadow-2xl' : ''}
       `}
       style={{
