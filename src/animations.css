@@ -472,3 +472,21 @@
   animation-iteration-count: 1;
   animation-fill-mode: forwards;
 }
+
+/* ========================================
+   COMBO ANIMATIONS
+   ======================================== */
+
+/* Combo glow pulse for active combos */
+@keyframes comboGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.4), 3px 3px 0px #000000;
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.6), 3px 3px 0px #000000;
+  }
+}
+
+.combo-glow {
+  animation: comboGlow 2s ease-in-out infinite;
+}

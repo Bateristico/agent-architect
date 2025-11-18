@@ -8,9 +8,14 @@ import { GameHUD } from '../components/GameHUD';
 import { GameBoard } from '../components/GameBoard';
 import { GameFooter } from '../components/GameFooter';
 import { GameControls } from '../components/GameControls';
+import { ScoreBreakdown } from '../components/ScoreBreakdown';
+import { ComboNotification } from '../components/ComboNotification';
 import { useKeyboardShortcuts } from '../hooks';
-import type { Board, Card } from '../types';
+import { calculateTotalSynergy, detectAchievedCombos, calculateComboBonus, wouldCompleteCombo } from '../game/scoring';
+import type { Board } from '../types';
 import type { IBoard, ICard } from '../game/types';
+import type { Card } from '../types/card';
+import { getRequiredSlots } from '../types/game';
 
 interface GameScreenProps {
   onBack: () => void;
@@ -65,32 +70,35 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
     [levelData.number]
   );
 
+  // Get required slots using helper (supports both old and new slot systems)
+  const requiredSlots = getRequiredSlots(levelData);
+
   // Game state
   const [board, setBoard] = useState<IBoard>({
     context: {
       type: 'context',
       card: null,
-      required: levelData.requiredSlots.context,
+      required: requiredSlots.context,
     },
     model: {
       type: 'model',
       card: null,
-      required: levelData.requiredSlots.model,
+      required: requiredSlots.model,
     },
     tools: {
       type: 'tools',
       card: null,
-      required: levelData.requiredSlots.tools,
+      required: requiredSlots.tools,
     },
     framework: {
       type: 'framework',
       card: null,
-      required: levelData.requiredSlots.framework,
+      required: requiredSlots.framework,
     },
     guardrails: {
       type: 'guardrails',
       card: null,
-      required: levelData.requiredSlots.guardrails,
+      required: requiredSlots.guardrails,
     },
   });
 
@@ -101,6 +109,8 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
   const [chips] = useState(1250);
   const [stars] = useState({ current: 15, total: 20 });
   const [shakeCard, setShakeCard] = useState<string | null>(null);
+  const [comboNotification, setComboNotification] = useState<string | null>(null);
+  const showScoreBreakdown = true; // Always show score breakdown
 
   // Timer countdown
   useEffect(() => {
@@ -109,6 +119,32 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  // Helper: Get all placed cards
+  const getPlacedCards = (): Card[] => {
+    const placed: Card[] = [];
+    Object.values(board).forEach((slot) => {
+      if (slot.card) {
+        placed.push(slot.card as unknown as Card);
+      }
+    });
+    return placed;
+  };
+
+  // Calculate current score and modifiers
+  const placedCards = getPlacedCards();
+  const synergyData = useMemo(() => calculateTotalSynergy(placedCards), [board]);
+  const achievedCombos = useMemo(
+    () => detectAchievedCombos(placedCards, levelData.availableCombos || []),
+    [board, levelData.availableCombos]
+  );
+  const comboBonus = useMemo(() => calculateComboBonus(achievedCombos), [achievedCombos]);
+
+  const currentScore = useMemo(() => {
+    const baseScore = placedCards.length * 20;
+    const totalModifier = (synergyData.netModifier + comboBonus) / 100;
+    return Math.round(Math.max(0, baseScore * (1 + totalModifier)));
+  }, [placedCards.length, synergyData.netModifier, comboBonus]);
 
   // Handle card selection from hand
   const handleSelectCard = (card: ICard) => {
@@ -144,6 +180,18 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
 
     // Place new card
     setBoard({ ...board, [slotType]: { ...slot, card } });
+
+    // Check if this card completes a combo
+    const currentCards = getPlacedCards();
+    const completedCombo = wouldCompleteCombo(
+      card as unknown as Card,
+      currentCards,
+      levelData.availableCombos || []
+    );
+
+    if (completedCombo) {
+      setComboNotification(completedCombo.name);
+    }
   };
 
   // Handle removing card from slot
@@ -160,31 +208,32 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
 
   // Handle reset
   const handleReset = () => {
+    const resetRequiredSlots = getRequiredSlots(levelData);
     setBoard({
       context: {
         type: 'context',
         card: null,
-        required: levelData.requiredSlots.context,
+        required: resetRequiredSlots.context,
       },
       model: {
         type: 'model',
         card: null,
-        required: levelData.requiredSlots.model,
+        required: resetRequiredSlots.model,
       },
       tools: {
         type: 'tools',
         card: null,
-        required: levelData.requiredSlots.tools,
+        required: resetRequiredSlots.tools,
       },
       framework: {
         type: 'framework',
         card: null,
-        required: levelData.requiredSlots.framework,
+        required: resetRequiredSlots.framework,
       },
       guardrails: {
         type: 'guardrails',
         card: null,
-        required: levelData.requiredSlots.guardrails,
+        required: resetRequiredSlots.guardrails,
       },
     });
     setEnergyRemaining(levelData.energyBudget);
@@ -285,6 +334,13 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
             board={board as unknown as Board}
             onRemoveCard={handleRemoveCard}
             combos={combos}
+            modifiers={{
+              synergyBonus: synergyData.totalBonus,
+              antiSynergyPenalty: synergyData.totalPenalty,
+              comboBonus: comboBonus,
+              netModifier: synergyData.netModifier + comboBonus,
+              currentScore: currentScore,
+            }}
           />
 
           {/* Bottom Panel with Scenario and Controls */}
@@ -299,6 +355,26 @@ export const GameScreen: React.FC<GameScreenProps> = ({ onBack, onSubmit }) => {
           />
         </div>
       </motion.div>
+
+      {/* Score Breakdown - Now integrated into GameBoard combo panel */}
+      {/* Keeping component here but hidden in case we want to toggle it back */}
+      <div className="fixed top-20 right-4 z-20 max-w-xs" style={{ display: 'none' }}>
+        <ScoreBreakdown
+          synergyBonus={synergyData.totalBonus}
+          antiSynergyPenalty={synergyData.totalPenalty}
+          comboBonus={comboBonus}
+          netModifier={synergyData.netModifier + comboBonus}
+          achievedCombos={achievedCombos.map(c => c.name)}
+          currentScore={currentScore}
+          isVisible={false}
+        />
+      </div>
+
+      {/* Combo Notification - Fixed centered at top */}
+      <ComboNotification
+        comboName={comboNotification}
+        onDismiss={() => setComboNotification(null)}
+      />
     </div>
   );
 };

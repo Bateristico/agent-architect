@@ -51,8 +51,8 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
       style={{
         height: '60px',
         background: 'var(--card)',
-        borderBottom: '3px solid var(--border)',
-        boxShadow: '0 3px 0px var(--shadow-color, #000000)',
+        borderBottom: '4px solid var(--border)',
+        boxShadow: '0 4px 0px var(--shadow-color, #000000)',
       }}
     >
       <div className="flex items-center gap-4">
@@ -66,6 +66,7 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
             fontFamily: "'Press Start 2P', monospace",
             padding: '12px 20px',
             transition: 'all 100ms ease-out',
+            fontSize: '10px',
           }}
         >
           <ArrowLeft className="w-4 h-4" />
@@ -75,10 +76,13 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
           className="flex items-center gap-2 px-3 py-2 text-xs pl-3"
           style={{
             background: 'var(--muted)',
-            border: '2px solid var(--border)',
-            boxShadow: 'var(--shadow-xs)',
-            fontFamily: 'var(--font-sans)',
+            border: '4px solid var(--border)',
+            borderRadius: '2px',
+            boxShadow: '3px 3px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            fontSize: '10px',
             color: 'var(--foreground)',
+            textShadow: '1px 1px 0px #000000',
           }}
         >
           🎯 <span className="pl-1">LEVEL {levelNumber}</span>
@@ -105,12 +109,15 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
                 : energyRemaining <= 4
                 ? 'var(--accent)'
                 : 'var(--success-color)',
-            border: '2px solid var(--border)',
-            boxShadow: 'var(--shadow-xs)',
-            fontFamily: 'var(--font-sans)',
+            border: '4px solid var(--border)',
+            borderRadius: '2px',
+            boxShadow: '3px 3px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            fontSize: '9px',
             color:
               energyRemaining <= 2 ? 'var(--foreground)' : 'var(--background)',
             fontWeight: 'bold',
+            textShadow: energyRemaining <= 2 ? '1px 1px 0px #000000' : 'none',
             transition: 'all 200ms ease-out',
           }}
         >
@@ -125,10 +132,13 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
           className="flex items-center gap-2 px-3 py-2"
           style={{
             background: 'var(--muted)',
-            border: '2px solid var(--border)',
-            boxShadow: 'var(--shadow-xs)',
-            fontFamily: 'var(--font-sans)',
+            border: '4px solid var(--border)',
+            borderRadius: '2px',
+            boxShadow: '3px 3px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            fontSize: '9px',
             color: 'var(--foreground)',
+            textShadow: '1px 1px 0px #000000',
           }}
         >
           💰 <span>CHIPS: {chips}</span>
@@ -139,10 +149,13 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
           className="flex items-center gap-2 px-3 py-2"
           style={{
             background: 'var(--muted)',
-            border: '2px solid var(--border)',
-            boxShadow: 'var(--shadow-xs)',
-            fontFamily: 'var(--font-sans)',
+            border: '4px solid var(--border)',
+            borderRadius: '2px',
+            boxShadow: '3px 3px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            fontSize: '9px',
             color: 'var(--foreground)',
+            textShadow: '1px 1px 0px #000000',
           }}
         >
           ⭐{' '}
@@ -156,10 +169,13 @@ export const GameHUD: React.FC<GameHUDProps> = React.memo(({
           className="flex items-center gap-2 px-3 py-2"
           style={{
             background: 'var(--muted)',
-            border: '2px solid var(--border)',
-            boxShadow: 'var(--shadow-xs)',
-            fontFamily: 'var(--font-sans)',
+            border: '4px solid var(--border)',
+            borderRadius: '2px',
+            boxShadow: '3px 3px 0px #000000',
+            fontFamily: "'Press Start 2P', monospace",
+            fontSize: '9px',
             color: timer < 30 ? 'var(--error-color)' : 'var(--foreground)',
+            textShadow: '1px 1px 0px #000000',
           }}
         >
           🕐 <span>{formatTime(timer)}</span>
